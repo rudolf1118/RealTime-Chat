@@ -4,7 +4,6 @@ import { Server } from 'socket.io';
 import mongoose from 'mongoose';
 import cors from 'cors';
 
-
 interface ChatMessage {
     user: string;
     message: string;
@@ -12,9 +11,7 @@ interface ChatMessage {
 
 const app = express();
 const server = http.createServer(app);
-const io = new Server(server, {
-    cors: { origin: `http://localhost:${process.env.PORT}`, methods: ['GET', 'POST'] },
-});
+const io = new Server(server, {cors:{origin: `*`}});
 
 app.use(cors());
 app.use(express.json());
@@ -22,9 +19,9 @@ app.use(express.json());
 // MongoDB Connection
 const start = async () => {
     try {
-        await mongoose.connect(process.env.MONGODB_SRV);
-        server.listen(process.env.PORT, () => {
-            console.log(`Server is running on port ${process.env.PORT}`);
+        // await mongoose.connect(process.env.MONGODB_SRV);
+        server.listen(8080, () => {
+            console.log(`Server is running on port 8080`);
         });
     } catch (error) {
         console.error(error);
@@ -34,6 +31,7 @@ io.on('connection', (socket) => {
     console.log('User connected:', socket.id);
 
     socket.on('sendMessage', (data: ChatMessage) => {
+        console.log(data)
         io.emit('receiveMessage', data);
     });
 
