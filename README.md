@@ -1,2 +1,1 @@
-# RealTime-Chat
-# RealTime-Chat
+This project is a real-time chat application that utilizes React for the front end and Node.js and Express.js with Socket.IO for the back end, enabling instant messaging capabilities. It leverages modern web technologies like TypeScript and Tailwind CSS to provide a robust and scalable architecture for seamless user interaction.
