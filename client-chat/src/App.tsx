@@ -1,20 +1,54 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import {
+  Container,
+  Box,
+  TextField,
+  IconButton,
+  Typography,
+  List,
+  ListItem,
+  ListItemText,
+  Paper,
+  styled,
+} from '@mui/material';
+import SendIcon from '@mui/icons-material/Send';
 import { io, Socket } from 'socket.io-client';
-import ChatService from './chat/chatService';
+import Navbar from './navbar/navbar';
+import Chat from './chat/chatService';
 
-
-interface ChatMessage {
+interface Message {
   user: string;
-  message: string;
+  text: string;
 }
 
-export const socket: Socket = io(`ws://localhost:8080`);
-
+export const socket: Socket = io('http://localhost:8080');
 
 const App: React.FC = () => {
-    const [message, setMessage] = useState<string>('');
+  const [message, setMessage] = useState<string>('');
+  const [chat, setChat] = useState<Message[]>([]);
 
-    return <div><ChatService messages={message} /></div>;
+  useEffect(() => {
+    socket.on('receiveMessage', (msg: Message) => {
+      setChat((prev) => [...prev, msg]);
+    });
+
+    return () => {
+      socket.off('receiveMessage');
+    };
+  }, []);
+
+  const handleSendMessage = () => {
+    if (message.trim()) {
+      const newMessage: Message = { user: 'User1', text: message };
+      socket.emit('sendMessage', newMessage);
+      setMessage('');
+    }
+  };
+
+  return (
+        <Chat username="Andrew Petrov" messages={[]} online={true}/>
+  );
+  
 };
 
 export default App;

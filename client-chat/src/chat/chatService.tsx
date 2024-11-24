@@ -2,6 +2,9 @@ import React, { useEffect, useState } from 'react';
 import ChatWith from './chatWith';
 import ChatMessage from './chatMessage';
 import ChatInput from './chatInput';
+import { Container, Box, TextField, IconButton } from '@mui/material';
+import SendIcon from '@mui/icons-material/Send';
+import Navbar from '../navbar/navbar';
 import { socket } from '../App';
 
 interface Message {
@@ -9,9 +12,8 @@ interface Message {
     message: string;
   }
 
-const Chat: React.FC<{ username?: string, avatar?:any, online?:boolean, messages?:string }> = (props) => {
-    const [chat, setChat] = useState<Message[]>([]);
-
+const Chat: React.FC<{ username?: string, online?:boolean, messages?:Message[] }> = (props) => {
+    const [chat, setChat] = useState<Message[]>(props.messages || []);
     useEffect(() => {
         const handleMessage = (data: Message) => {
             setChat((prevChat) => [...prevChat, data]);
@@ -23,19 +25,15 @@ const Chat: React.FC<{ username?: string, avatar?:any, online?:boolean, messages
         };
     }, []);
 
-    return (<div className= "flex-col" >
-            <div className="chat-header">
-                <ChatWith username="John Doe" avatar="https://via.placeholder.com/150" online={true} message="Hello"/>
-            </div>
-            <div className="chat-body">
-                {chat.map((msg, index) => (
-                    <ChatMessage key={index} author={msg.user} messages={msg.message} />
-                ))}
-            </div>
-            <div className="chat-footer">
-                <ChatInput messages={props.messages || ''}/>
-            </div>
-        </div>
+    return (
+        <Container className="MuiContainer-root">
+            <Navbar />
+            <Box display="flex" flexDirection="column">
+                <ChatWith username={props.username || ''} online={props.online || false} />
+                <ChatMessage messages={chat} />
+                <ChatInput />
+            </Box>
+        </Container>
     );
 };
 

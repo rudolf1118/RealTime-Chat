@@ -1,15 +1,15 @@
 import React from 'react';
+import ProfileIcon from './profileIcon';
+import { Box } from '@mui/material';
+import { Typography } from '@mui/material';
 
-const ChatWith: React.FC<{ username: string, message: string, avatar:any, online:boolean }> = (props) => {
-    return <div className="flex items-center gap-2">
-        <div className="flex-col">
-            <img src={props.avatar} alt="avatar" className="w-10 h-10 rounded-full" />
-            <span>{props.online ? 'online' : 'offline'}</span>
-        </div>
-        <div className="flex-col">
-            <span>{props.username}</span>
-        </div>
-    </div>;
+const ChatWith: React.FC<{ username: string, online:boolean }> = (props) => {
+    return (
+        <Box display="flex" gap={2}>
+            <ProfileIcon username={props.username} online={props.online} />
+            <Typography sx={{fontWeight: 'semibold', color: 'black'}} variant="h6">{props.username || "Andrew Petrov"}</Typography>
+        </Box>
+    )
 };
 
 export default ChatWith;

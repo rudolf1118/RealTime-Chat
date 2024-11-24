@@ -1,4 +1,7 @@
-import React, { useState } from 'react';
+import { Box, Container, TextField } from '@mui/material';
+import { IconButton } from '@mui/material';
+import SendIcon from '@mui/icons-material/Send';
+import React, { useEffect, useState } from 'react';
 import { socket } from '../App';
 
 interface Message {
@@ -6,20 +9,37 @@ interface Message {
     message: string;
   }
 
-const ChatInput: React.FC<{ messages: string }> = (props) => {
+const ChatInput: React.FC<{}> = (props) => {
     const [message, setMessage] = useState<string>('');
-    const [chat, setChat] = useState<Message[]>([]);
-    const handleMessage = (data: Message) => {
-        setChat((prevChat) => [...prevChat, data]);
+
+    const sendingMessage = (message: string) => {
+        socket.emit('sendMessage', {user: "me", message: message});
+        setMessage('');
     };
-    
-    return <div className="flex items-center gap-2">
-        <input type="text" value={message} placeholder="Write a message" onChange={(e) => setMessage(e.target.value)} />
-        <button onClick={() => {
-            socket.emit('sendMessage', { user: 'John Doe', message });
-            setMessage('');
-        }}>Send</button>
-    </div>;
+
+    return (
+        <Box display="flex" gap={2}>
+    <TextField
+        fullWidth
+        variant="outlined"
+        placeholder="Type a message..."
+        value={message}
+        onKeyDown={(e) => {
+            if (e.key === 'Enter') {
+                sendingMessage(message);
+                setMessage('');
+            }
+        }}
+        onChange={(e) => setMessage(e.target.value)}
+      />
+      <IconButton sx={{":hover": {color: 'blue'}}} color="primary" onClick={() => {
+        sendingMessage(message);
+        setMessage('');
+      }}>
+        <SendIcon />
+      </IconButton>
+        </Box>
+    )
 };
 
 export default ChatInput;
