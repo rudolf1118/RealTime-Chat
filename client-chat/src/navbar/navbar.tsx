@@ -218,7 +218,6 @@ export default function PrimarySearchAppBar() {
               size="large"
               aria-label="show more"
               aria-controls={mobileMenuId}
-              aria-haspopup="true"
               onClick={handleMobileMenuOpen}
               color="inherit"
             >

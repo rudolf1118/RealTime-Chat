@@ -1,28 +1,26 @@
 import express from 'express';
 import http from 'http';
-import { Server } from 'socket.io';
 import mongoose from 'mongoose';
 import cors from 'cors';
-import authRouter from './auth/authRouter';
+import authRouter from './routes/messageRoutes';
+import userRouter from './routes/userRoutes';
 import dotenv from 'dotenv';
-dotenv.config();
-interface ChatMessage {
-    user: string;
-    message: string;
-}
+import { socketConnection }from './WebSocket/socketConnection';
+import { Server } from 'socket.io';
 
-const app = express();
-const server = http.createServer(app);
-const io = new Server(server, {cors:{origin: `*`}});
+dotenv.config();
+export const app = express();
+export const server = http.createServer(app);
 
 app.use(cors());
 app.use(express.json());
-app.use('/auth', authRouter);
+app.use(authRouter);
+app.use(userRouter);
 
-// MongoDB Connection
 const start = async () => {
     try {
         await mongoose.connect(process.env.MONGODB_SRV as string);
+        console.log(`Connected to MongoDB`);
         server.listen(process.env.PORT, () => {
             console.log(`Server is running on port ${process.env.PORT}`);
         });
@@ -30,17 +28,6 @@ const start = async () => {
         console.error(error);
     }
 };
-io.on('connection', (socket) => {
-    console.log('User connected:', socket.id);
-
-    socket.on('sendMessage', (data: ChatMessage) => {
-        console.log(data)
-        io.emit('receiveMessage', data);
-    });
-
-    socket.on('disconnect', () => {
-        console.log('User disconnected:', socket.id);
-    });
-});
 
 start();
+socketConnection(); 

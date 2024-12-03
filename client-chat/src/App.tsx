@@ -1,52 +1,38 @@
 import React, { useState, useEffect } from 'react';
-import {
-  Container,
-  Box,
-  TextField,
-  IconButton,
-  Typography,
-  List,
-  ListItem,
-  ListItemText,
-  Paper,
-  styled,
-} from '@mui/material';
-import SendIcon from '@mui/icons-material/Send';
 import { io, Socket } from 'socket.io-client';
-import Navbar from './navbar/navbar';
 import Chat from './chat/chatService';
+import { getMessages } from './chat/chatAPI';
+import { BrowserRouter } from 'react-router-dom';
+import { Route } from 'react-router-dom';
+import { Routes } from 'react-router-dom';
+import LoginPage from './auth/loginPage';
+import RegistrationPage from './auth/registrationPage';
 
 interface Message {
-  user: string;
+  senderId: string;
+  receiverId: string;
   text: string;
+  timestamp?: string;
 }
 
-export const socket: Socket = io('http://localhost:8080');
+const getUserIdFromURL = () => {
+  const searchParams = new URLSearchParams(window.location.search);
+  return searchParams.get('user') || 'guest';
+};
 
 const App: React.FC = () => {
-  const [message, setMessage] = useState<string>('');
   const [chat, setChat] = useState<Message[]>([]);
-
-  useEffect(() => {
-    socket.on('receiveMessage', (msg: Message) => {
-      setChat((prev) => [...prev, msg]);
-    });
-
-    return () => {
-      socket.off('receiveMessage');
-    };
-  }, []);
-
-  const handleSendMessage = () => {
-    if (message.trim()) {
-      const newMessage: Message = { user: 'User1', text: message };
-      socket.emit('sendMessage', newMessage);
-      setMessage('');
-    }
-  };
+  const [receiverId, setReceiverId] = useState<string>(getUserIdFromURL());
+  const senderId = receiverId === 'user1' ? 'user2' : 'user1';
 
   return (
-        <Chat username="Andrew Petrov" messages={[]} online={true}/>
+    <BrowserRouter>
+    <Routes>
+      <Route path="/login" element={<LoginPage />} />
+      <Route path="/register" element={<RegistrationPage />} />
+      <Route path="/chat" element={<Chat username="" online={true} />} />
+    </Routes>
+  </BrowserRouter>
   );
   
 };

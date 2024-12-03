@@ -1,0 +1,21 @@
+[
+    {
+      "senderId": "user1",
+      "receiverId": "user2",
+      "text": "Привет, как дела?",
+      "timestamp": "2024-11-24T12:00:00Z"
+    },
+    {
+      "senderId": "user2",
+      "receiverId": "user1",
+      "text": "Привет, все хорошо! Как у тебя?",
+      "timestamp": "2024-11-24T12:05:00Z"
+    },
+    {
+      "senderId": "user1",
+      "receiverId": "user2",
+      "text": "У меня тоже отлично, спасибо!",
+      "timestamp": "2024-11-24T12:10:00Z"
+    }
+  ]
+  
