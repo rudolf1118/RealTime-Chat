@@ -26,11 +26,12 @@ const getUserIdFromURL = () => {
 const Chat: React.FC<{ username?: string, online?:boolean, messages?:Message[] }> = (props) => {
     const [chat, setChat] = useState<Message[]>(props.messages || []);
     const [receiverId, setReceiverId] = useState<string>(getUserIdFromURL());
-    const senderId = receiverId === 'user1' ? 'user2' : 'user1';
+    const senderId = props.username;
 
     useEffect(() => {
         const fetchMessages = async () => {
             const messages = await getMessages(senderId, receiverId);
+            console.log(messages);
             setChat(messages);
         };
         fetchMessages();

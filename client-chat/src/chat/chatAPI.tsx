@@ -1,8 +1,13 @@
 import axios from 'axios';
 
 export const getMessages = async (senderId: string, receiverId: string) => {
-    const response = await axios.get(`http://localhost:8080/messages?senderId=${senderId}&receiverId=${receiverId}`);
-    return response.data;
+    try {
+        const response = await axios.get(`http://localhost:8080/messages?senderId=${senderId}&receiverId=${receiverId}`);
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching messages:', error);
+        throw error;
+    }
 }
 
 // TODO: fix this

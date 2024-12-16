@@ -7,6 +7,8 @@ import userRouter from './routes/userRoutes';
 import dotenv from 'dotenv';
 import { socketConnection }from './WebSocket/socketConnection';
 import { Server } from 'socket.io';
+import protectedRoute from './routes/protectedRoute';
+import morgan from 'morgan';
 
 dotenv.config();
 export const app = express();
@@ -14,9 +16,9 @@ export const server = http.createServer(app);
 
 app.use(cors());
 app.use(express.json());
-app.use(authRouter);
-app.use(userRouter);
-
+app.use("/api/auth", userRouter);
+app.use("/api/protected", protectedRoute);
+app.use(morgan("dev")); // Log all requests to the console
 const start = async () => {
     try {
         await mongoose.connect(process.env.MONGODB_SRV as string);
