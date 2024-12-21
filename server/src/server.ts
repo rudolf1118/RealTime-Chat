@@ -8,6 +8,7 @@ import dotenv from 'dotenv';
 import { socketConnection }from './WebSocket/socketConnection';
 import { Server } from 'socket.io';
 import protectedRoute from './routes/protectedRoute';
+import friendRouter from './routes/friendRoutes';
 import morgan from 'morgan';
 
 dotenv.config();
@@ -17,6 +18,7 @@ export const server = http.createServer(app);
 app.use(cors());
 app.use(express.json());
 app.use("/api/auth", userRouter);
+app.use("/api/friends", friendRouter);
 app.use("/api/protected", protectedRoute);
 app.use(morgan("dev")); // Log all requests to the console
 const start = async () => {

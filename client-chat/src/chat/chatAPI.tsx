@@ -1,8 +1,8 @@
-import axios from 'axios';
+import API from "../config/APi";
 
 export const getMessages = async (senderId: string, receiverId: string) => {
     try {
-        const response = await axios.get(`http://localhost:8080/messages?senderId=${senderId}&receiverId=${receiverId}`);
+        const response = await API.serverAPI_With_Auth.get(`/messages?senderId=${senderId}&receiverId=${receiverId}`);
         return response.data;
     } catch (error) {
         console.error('Error fetching messages:', error);
@@ -12,7 +12,7 @@ export const getMessages = async (senderId: string, receiverId: string) => {
 
 // TODO: fix this
 export const postMessages = async (senderId: string, receiverId: string, text: string, timestamp: string): Promise<void> => {
-    await axios.post(`http://localhost:8080/messages`, {senderId, receiverId, text, timestamp}).catch((error) => {
+    await API.serverAPI_With_Auth.post(`/messages`, {senderId, receiverId, text, timestamp}).catch((error) => {
         console.error('Error posting message:', error);
     });
 }

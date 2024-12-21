@@ -39,7 +39,7 @@ class AuthController implements Auth_Controller {
             console.log(user);
             const token = tokenGenerator(user._id.toString(), user.role);
             console.log(token);
-            res.status(200).json({ status: "success", message: "Login successful.", token });
+            res.status(200).json({ status: "success", message: "Login successful.", token, user_id: user._id });
         } catch (error) {
             next(error);
             console.log("error in auth controller", error);

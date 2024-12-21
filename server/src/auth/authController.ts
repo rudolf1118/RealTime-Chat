@@ -79,6 +79,10 @@ class AuthController {
             return res.status(400).json({ message: "Error creating admin." });
         }
     }
+    async getUserId(req, res) {
+        const user = await User.findOne({ username: req.body.username });
+        return res.json(user._id);
+    }
 }
 
 export default new AuthController();

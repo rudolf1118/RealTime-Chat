@@ -5,7 +5,7 @@ import axios from "axios";
 import { loginUser } from "./authAPI";
 import { useNavigate } from 'react-router-dom';
 
-const LoginPage = () => {
+const LoginPage = (props: { handleCreds: (user: any) => void }) => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
@@ -39,8 +39,8 @@ const LoginPage = () => {
             const { token } = response?.data;
 
             localStorage.setItem('token', token);
-
-            console.log('Login successful:', token);
+            const { user_id } = response.data;
+            props.handleCreds(user_id);
 
             navigate('/main');
         } catch (err: any) {

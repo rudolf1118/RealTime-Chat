@@ -1,10 +1,13 @@
-import axios from 'axios';
-
+import API from "../config/APi";
 export const registerUser = async (user: {username: string, email: string, password: string}): Promise<any> => {
     console.log("this is registering user to backend", {user});
     
         try {
-            const request = await axios.post(`http://localhost:8080/api/auth/signup`, {username: user.username, email: user.email, password: user.password});
+        const request = await API.serverAPI_WO_Auth.post(`/auth/signup`, {
+            username: user.username,
+            email: user.email,
+            password: user.password
+        });
         return request;
     } catch (error) {
         console.error('Error registering user:', error);
@@ -20,12 +23,13 @@ export const loginUser = async (email: string, password: string): Promise<any> =
     console.log("this is logging in user to backend", {email, password});
     
     try {
-        const request = await axios.post(`http://localhost:8080/api/auth/login`, {email, password});
-        console.log(request);
+        const request = await API.serverAPI_WO_Auth.post(`/auth/login`, {
+            email: email,
+            password: password
+        });
         return request;
     } catch (error) {
         console.error('Error logging in user:', error);
-        console.log(error)
         const errorMessage = error.response?.data?.message || 'An error occurred';
         return { error: errorMessage }; // Return the error message
     }
