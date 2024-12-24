@@ -9,14 +9,14 @@ interface FriendListProps {
     friends: any[]; // Define the type of friends as needed
 }
 const Side:React.FC<any> = (props: any) => {
-    console.log(props.user_id);
+    console.log("THIS IS USER_ID",props.user_id);
     return (
         <>
         <ProtectedRoute>
-            <Box sx={{ display: 'flex', height: '100vh' }}>
+            <Box sx={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
                 <SideBar />
                 <Routes>
-                    <Route path="friends" element={<FriendList user_id={props.user_id} />} />
+                    <Route path="friends" element={<FriendList/>} />
                 </Routes>
             </Box>
         </ProtectedRoute>

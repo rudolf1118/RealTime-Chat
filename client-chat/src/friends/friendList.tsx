@@ -7,7 +7,7 @@ interface FriendListProps {
   user_id: string;
 }
 
-const FriendList: React.FC<FriendListProps> = ({ user_id }) => {
+const FriendList: React.FC<any> = ( ) => {
 
     const [friendsList, setFriendsList] = useState<any>([]);
 
@@ -20,12 +20,11 @@ const FriendList: React.FC<FriendListProps> = ({ user_id }) => {
 
     useEffect(() => {
         const fetchFriends = async () => {
-            console.log("user_id", user_id);    
-            const fetchedFriends = await getFriendList(user_id);
+            const fetchedFriends = await getFriendList();
             console.log("fetchedFriends", fetchedFriends);
-            fetchedFriends ? setFriendsList(fetchedFriends.friends) : setFriendsList([]);
+            fetchedFriends ? setFriendsList(fetchedFriends) : setFriendsList([]);
         }
-        fetchFriends();
+        (async () => await fetchFriends())();
     }, []);
 
   return (
@@ -33,16 +32,16 @@ const FriendList: React.FC<FriendListProps> = ({ user_id }) => {
       <Box>
         <Table>
           <TableBody>
-            {friendsList?.map((friend:any, index) => (
+            {friendsList.map((friend: any, index: number) => (
               <TableRow key={index}>
-                <TableCell>{friend?.username}</TableCell>
-                <TableCell>{friend?.email}</TableCell>
-                <TableCell>
+                <TableCell align="center">{friend.username}</TableCell>
+                <TableCell align="center">{friend.email}</TableCell>
+                <TableCell align="center">
                     <Button 
-                        sx= {{ width:"100px", height:"30px", fontSize:"8px", padding:0 }} 
+                        sx={{ width: "100px", height: "30px", fontSize: "8px", marginTop: "10px" }} 
                         variant="contained" 
                         color="error" 
-                        onClick = {() => handleRemoveFriend(index)}>Remove Friend</Button>
+                        onClick={() => handleRemoveFriend(index)}>Remove Friend</Button>
                 </TableCell>
               </TableRow>
             ))}

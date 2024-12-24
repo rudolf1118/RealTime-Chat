@@ -1,11 +1,12 @@
 import API from "../config/APi";
 
-export const getFriendList = async (user_id: string): Promise<any> => {
+export const getFriendList = async (): Promise<any> => {
     try {
-        const request = await API.serverAPI_With_Auth.get(`/friends/getFriendsList?user_id=${user_id}`);
-        return request;
+        const request = await API.serverAPI_With_Auth.get(`/friends/getFriendsList`);
+        return request?.data?.friends || [];
     } catch (error) {
         console.error('Error logging in user:', error);
+        console.log(error.response.data);
         const errorMessage = error.response?.data?.message || 'An error occurred';
         return { error: errorMessage }; // Return the error message
     }
