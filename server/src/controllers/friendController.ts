@@ -1,11 +1,12 @@
 import config from "../auth/tokenGeneration/config";
 import User from "../models/userModel";
 import { Friend_Controller } from "../types/Controllers";
+import { ModuleRes } from "../types/UtilTypes";
 import { validationResult } from 'express-validator';
 import jwt from "jsonwebtoken";
 
 class FriendController implements Friend_Controller {
-    async addFriend(req: any, res: any, next: any): Promise<any> {
+    async addFriend(req: any, res: any, next: any): Promise<ModuleRes> {
         try {
             const { userId, friendId } = req.body;
             const user = await User.findById(userId);
@@ -28,7 +29,7 @@ class FriendController implements Friend_Controller {
             res.status(500).json({ status: "error", message: error.message });  
         }
     }
-    async getFriendById(req: any, res: any, next: any): Promise<any> {
+    async getFriendById(req: any, res: any, next: any): Promise<ModuleRes> {
         try {
             const { userId } = req.body;
             const user = await User.findById("676037263f80f58b95bfd35e");
@@ -36,44 +37,39 @@ class FriendController implements Friend_Controller {
             user.friends.push("6759b7e6d7f3367a61d267ca")
             user.friends.push("6759b76cd7f3367a61d267c8")
             await user.save();
-            res.status(200).json({ status: "success", message: "Friends list fetched successfully", friends: user.friends });
+            return res.status(200).json({ status: "success", message: "Friends list fetched successfully", friends: user.friends });
         } catch (error) {
             next();
             console.log("error in auth controller", error);
             res.status(500).json({ status: "error", message: error.message });  
         }
     }
-    async getFriendsList(req: any, res: any, next: any): Promise<any> {
+    async getFriendsList(req: any, res: any, next: any): Promise<ModuleRes> {
         try {
             const { authorization } = req.headers;
             const token = authorization.split(" ")[1];
-            console.log("THIS IS TOKEN", token);
             const decoded = jwt.verify(token, config.secret as any);
             const user_id = (decoded as any).id;
-            console.log("THIS IS USER_ID", user_id);
             const errors = validationResult(req);
-            console.log("THIS IS ERRORS", errors);
             if (!errors.isEmpty()) {
                 return res.status(400).json({ errors });
             }
             const user = await User.findById(user_id);
-            console.log("THIS IS USER", user);
             if (!user) {
                 return res.status(404).json({ status: "error", message: "User not found." });
             }
             const friends = await User.find({ _id: { $in: user.friends } });
-            console.log("THIS IS FRIENDS", friends);
-            const sensFriends = friends.map((friend:any) => {
+            const sensFriends = friends?.map((friend:any) => {
                 const { password, ...rest } = friend.toObject();
                 return rest;
             });
             res.status(200).json({ status: "success", message: "Friends list fetched successfully", friends: sensFriends });
         } catch (error) {
             next();
-            console.log("error in auth controller", error);
+            console.log("error in friend controller", error);
             res.status(500).json({ status: "error", message: error.message });  
         }
     }
 }
 
-export default new FriendController;
+export default new FriendController();

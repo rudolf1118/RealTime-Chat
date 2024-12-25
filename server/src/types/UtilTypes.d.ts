@@ -6,3 +6,11 @@ export type NewMessage = {
     _id?: string;
     __v?: number;
 }
+
+export type ModuleRes = {
+    status: string;
+    message: string;
+    errors?: any;
+    data?: any;
+    token?: string;
+}

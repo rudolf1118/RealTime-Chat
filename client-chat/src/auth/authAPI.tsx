@@ -1,7 +1,5 @@
 import API from "../config/APi";
 export const registerUser = async (user: {username: string, email: string, password: string}): Promise<any> => {
-    console.log("this is registering user to backend", {user});
-    
         try {
         const request = await API.serverAPI_WO_Auth.post(`/auth/signup`, {
             username: user.username,
@@ -20,14 +18,26 @@ export const registerUser = async (user: {username: string, email: string, passw
 }
 
 export const loginUser = async (email: string, password: string): Promise<any> => {
-    console.log("this is logging in user to backend", {email, password});
-    
     try {
         const request = await API.serverAPI_WO_Auth.post(`/auth/login`, {
             email: email,
             password: password
         });
         return request;
+    } catch (error) {
+        console.error('Error logging in user:', error);
+        const errorMessage = error.response?.data?.message || 'An error occurred';
+        return { error: errorMessage }; // Return the error message
+    }
+}
+
+export const validateToken = async (token: string): Promise<any> => {    
+    try {
+        const request = await API.serverAPI_WO_Auth.post(`/auth/token`, {
+            token: token
+        });
+        if (request.status === 200) return true;
+        else return false;
     } catch (error) {
         console.error('Error logging in user:', error);
         const errorMessage = error.response?.data?.message || 'An error occurred';

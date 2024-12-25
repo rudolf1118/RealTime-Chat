@@ -32,7 +32,7 @@ const FriendList: React.FC<any> = ( ) => {
       <Box>
         <Table>
           <TableBody>
-            {friendsList.map((friend: any, index: number) => (
+            {friendsList?.map((friend: any, index: number) => (
               <TableRow key={index}>
                 <TableCell align="center">{friend.username}</TableCell>
                 <TableCell align="center">{friend.email}</TableCell>

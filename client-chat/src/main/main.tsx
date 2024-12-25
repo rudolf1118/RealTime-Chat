@@ -8,6 +8,7 @@ import Side from './sideComponents';
 import Chat from '../chat/chatService';
 import AlreadySignedIn from '../auth/alreadySignedIn';
 import Logout from '../auth/logout';
+import ChatList from '../chat/chatList';
 
 const Main: React.FC = () => {
   const [userId, setUserId] = useState<string | null>(null);
@@ -22,7 +23,7 @@ const Main: React.FC = () => {
                 <Route path="/" element={<LandingPage />} />
                 <Route path="/login" element={<AlreadySignedIn><LoginPage handleCreds={handleCreds} /></AlreadySignedIn>} />
                 <Route path="/register" element={<AlreadySignedIn><RegistrationPage /></AlreadySignedIn>} />
-                <Route path="/chat" element={<ProtectedRoute><Chat username="" online={true} /></ProtectedRoute>} />
+                <Route path="/chats/:id" element={<ProtectedRoute><Chat /></ProtectedRoute>} />
                 <Route path="/main/*" element={<ProtectedRoute><Side user_id={userId} /></ProtectedRoute>} />
             </Routes>
         </BrowserRouter>

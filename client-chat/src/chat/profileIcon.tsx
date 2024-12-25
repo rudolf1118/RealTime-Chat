@@ -54,12 +54,21 @@ function stringToColor(string: string) {
 }
 
 function stringAvatar(name: string) {
-  return {
-    sx: {
-      bgcolor: stringToColor(name),
-    },
-    children: `${name.split(' ')[0][0]}${name.split(' ')[1][0]}`,
-  };
+  try {
+    return {
+      sx: {
+        bgcolor: stringToColor(name),
+      },
+      children: `${name.split(' ')[0][0]}${name.split(' ')[1][0]}`,
+    };
+  } catch (error) {
+    return {
+      sx: {
+        bgcolor: stringToColor(name),
+      },
+      children: `${name[0]}`,
+    };
+  }
 }
 
 export default function BackgroundLetterAvatars(props: { username: string; online: boolean }) {

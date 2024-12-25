@@ -28,18 +28,18 @@ const Chat: React.FC<{ username?: string, online?:boolean, messages?:Message[] }
     const [receiverId, setReceiverId] = useState<string>(getUserIdFromURL());
     const senderId = props.username;
 
-    useEffect(() => {
-        const fetchMessages = async () => {
-            const messages = await getMessages(senderId, receiverId);
-            console.log(messages);
-            setChat(messages);
-        };
-        fetchMessages();
-      }, [senderId, receiverId]);
+    // useEffect(() => {
+    //     const fetchMessages = async () => {
+    //         const messages = await getMessages(senderId, receiverId);
+    //         console.log(messages);
+    //         setChat(messages);
+    //     };
+    //     fetchMessages();
+    //   }, [senderId, receiverId]);
     
-    useEffect(() => {
-        setChat(props.messages || []);
-    }, [props.messages]);
+    // useEffect(() => {
+    //     setChat(props.messages || []);
+    // }, [props.messages]);
 
     useEffect(() => {
         socket.emit('joinRoom', senderId);

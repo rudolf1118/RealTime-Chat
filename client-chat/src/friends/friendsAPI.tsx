@@ -6,8 +6,7 @@ export const getFriendList = async (): Promise<any> => {
         return request?.data?.friends || [];
     } catch (error) {
         console.error('Error logging in user:', error);
-        console.log(error.response.data);
-        const errorMessage = error.response?.data?.message || 'An error occurred';
+        const errorMessage = error?.response?.data?.message || 'An error occurred';
         return { error: errorMessage }; // Return the error message
     }
 }

@@ -6,7 +6,7 @@ export interface Message_Controller {
 export interface Auth_Controller {
     register(req: Request, res: Response, next: any): Promise<any>;
     login(req: Request, res: Response, next: any): Promise<any>;
-    logout(req: Request, res: Response): Promise<any>;
+    tokenChecker(req: Request, res: Response, next: any): Promise<any>;
 }
 
 export interface Friend_Controller {

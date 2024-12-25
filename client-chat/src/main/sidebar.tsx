@@ -75,7 +75,7 @@ const AppBar = styled(MuiAppBar, {
       props: ({ open }) => open,
       style: {
         marginLeft: drawerWidth,
-        width: `calc(100% - ${drawerWidth}px)`,
+        width: `calc(100% - ${drawerWidth}px )`,
         transition: theme.transitions.create(['width', 'margin'], {
           easing: theme.transitions.easing.sharp,
           duration: theme.transitions.duration.enteringScreen,
@@ -132,6 +132,10 @@ export default function Sidebar() {
   };
   const handleFriends = () => {
     navigate('/main/friends');
+  };
+
+  const handleDirectMessages = () => {
+    navigate('/main/chats');
   };
   return (
     <Container>
@@ -234,6 +238,7 @@ export default function Sidebar() {
                           justifyContent: 'center',
                         },
                   ]}
+                  onClick={handleDirectMessages}
                 >
                   <ListItemIcon
                     sx={[
@@ -414,7 +419,7 @@ export default function Sidebar() {
               </ListItem>
           </List>
         </Drawer>
-        <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
+        <Box component="main" sx={{ flexGrow: 1 }}>
           <DrawerHeader />
           <Typography sx={{ marginBottom: 2 }}>
           </Typography>
