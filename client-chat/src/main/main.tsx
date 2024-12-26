@@ -23,7 +23,6 @@ const Main: React.FC = () => {
                 <Route path="/" element={<LandingPage />} />
                 <Route path="/login" element={<AlreadySignedIn><LoginPage handleCreds={handleCreds} /></AlreadySignedIn>} />
                 <Route path="/register" element={<AlreadySignedIn><RegistrationPage /></AlreadySignedIn>} />
-                <Route path="/chats/:id" element={<ProtectedRoute><Chat /></ProtectedRoute>} />
                 <Route path="/main/*" element={<ProtectedRoute><Side user_id={userId} /></ProtectedRoute>} />
             </Routes>
         </BrowserRouter>

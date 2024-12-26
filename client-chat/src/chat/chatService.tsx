@@ -7,7 +7,9 @@ import { Container, Box, TextField, IconButton } from '@mui/material';
 import SendIcon from '@mui/icons-material/Send';
 import Navbar from '../navbar/navbar';
 import { io, Socket } from 'socket.io-client';
-
+import { getFriendById } from '../friends/friendsAPI';
+import { getUser } from '../auth/authAPI';
+import { socket } from '../socket/connection';
 interface Message {
     _id ?: string;
     senderId: string;
@@ -16,30 +18,31 @@ interface Message {
     timestamp?: string;
   }
 
-export const socket: Socket = io('http://localhost:8080');
-
 const getUserIdFromURL = () => {
     const searchParams = new URLSearchParams(window.location.search);
-    return searchParams.get('user') || 'guest';
+    const id = searchParams.get('id');
+    return id ? atob(id) : '';
 };
 
 const Chat: React.FC<{ username?: string, online?:boolean, messages?:Message[] }> = (props) => {
-    const [chat, setChat] = useState<Message[]>(props.messages || []);
-    const [receiverId, setReceiverId] = useState<string>(getUserIdFromURL());
-    const senderId = props.username;
+    const [chat, setChat] = useState<Message[]>([]);
+    const [receiver, setReceiver] = useState<any>({});
+    const [receiverId, setReceiverId] = useState<string>("");
+    const [sender, setSender] = useState<any>({});
+    const [senderId, setSenderId] = useState<string>("");
 
-    // useEffect(() => {
-    //     const fetchMessages = async () => {
-    //         const messages = await getMessages(senderId, receiverId);
-    //         console.log(messages);
-    //         setChat(messages);
-    //     };
-    //     fetchMessages();
-    //   }, [senderId, receiverId]);
-    
-    // useEffect(() => {
-    //     setChat(props.messages || []);
-    // }, [props.messages]);
+    useEffect(()=>{
+        const fetch = async () => {
+            const [sender, receiver] = await Promise.all([getUser(), getFriendById(getUserIdFromURL())]);
+            setSender(sender);
+            setSenderId(sender._id);
+            setReceiver(receiver);
+            setReceiverId(receiver._id);
+            const messages = await getMessages(sender._id, receiver._id);
+            setChat(messages.length > 0 ? messages : []);
+        }
+        (async () => await fetch())();
+    }, [])
 
     useEffect(() => {
         socket.emit('joinRoom', senderId);
@@ -57,8 +60,8 @@ const Chat: React.FC<{ username?: string, online?:boolean, messages?:Message[] }
 
     const sendMessage = (text: string) => {
         const newMessage: Message = {
-            senderId,
-            receiverId,
+            senderId: senderId,
+            receiverId: receiverId,
             text,
             timestamp: Date.now().toString(),
         };
@@ -67,10 +70,9 @@ const Chat: React.FC<{ username?: string, online?:boolean, messages?:Message[] }
     }
 
     return (
-        <Container className="MuiContainer-root">
-            <Navbar />
+        <Container sx={{ display: "flex", flexDirection: "column", justifyContent: "space-between", height: "100vh" }}>
             <Box display="flex" flexDirection="column">
-                <ChatWith username={props.username || ''} online={props.online || false} />
+                <ChatWith username={receiver.username || ''} online={receiver.online || false} />
                 <ChatMessage messages={chat} />
                 <ChatInput onSendMessage={sendMessage} />
             </Box>

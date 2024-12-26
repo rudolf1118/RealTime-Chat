@@ -2,7 +2,7 @@ import { Box, Container, TextField } from '@mui/material';
 import { IconButton } from '@mui/material';
 import SendIcon from '@mui/icons-material/Send';
 import React, { useEffect, useState } from 'react';
-import { socket } from './chatService';
+import { socket } from '../socket/connection';
 
 interface Message {
   senderId: string;

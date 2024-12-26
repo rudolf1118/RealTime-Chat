@@ -13,4 +13,5 @@ export type ModuleRes = {
     errors?: any;
     data?: any;
     token?: string;
+    friendRequests?: any;
 }

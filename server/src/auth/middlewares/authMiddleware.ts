@@ -3,6 +3,7 @@ import config from '../tokenGeneration/config';
 
 function verifyToken(req: any, res: any, next: any) {
     let token = req.header('Authorization');
+    if (!token) return res.status(401).json({ status: "error", message: 'Access denied' });
     token = token.split(' ')[1];
     if (!token) return res.status(401).json({ status: "error", message: 'Access denied' });
     try {

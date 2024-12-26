@@ -22,6 +22,7 @@ const ChatMessage: React.FC<{ messages: any }> = (props) => {
           flexDirection: 'column',
           p: 2,
           mb: 2,
+          marginTop: "20px"
         }}
       >
         <List>

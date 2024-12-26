@@ -17,7 +17,6 @@ const LoginPage = (props: { handleCreds: (user: any) => void }) => {
         const data = new FormData(event.currentTarget);
         const email = data.get('email') as string;
         const password = data.get('password') as string;
-        console.log(email, password);
     }
     const handleShowPassword = () => {
         setShowPassword(!showPassword);
@@ -26,7 +25,6 @@ const LoginPage = (props: { handleCreds: (user: any) => void }) => {
     const handleLogin = async () => {
         setError("");
         try {
-            console.log("front to controller", {email, password});
             const response = await loginUser(email, password); 
             if (response?.error?.includes("not found")) {
                 setError("Password or email is incorrect.");

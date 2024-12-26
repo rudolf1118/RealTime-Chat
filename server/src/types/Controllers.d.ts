@@ -7,6 +7,7 @@ export interface Auth_Controller {
     register(req: Request, res: Response, next: any): Promise<any>;
     login(req: Request, res: Response, next: any): Promise<any>;
     tokenChecker(req: Request, res: Response, next: any): Promise<any>;
+    getUserIdFromToken(req: Request): Promise<string>;
 }
 
 export interface Friend_Controller {

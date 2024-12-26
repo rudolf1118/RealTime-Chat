@@ -10,7 +10,7 @@ import { Server } from 'socket.io';
 import protectedRoute from './routes/protectedRoute';
 import friendRouter from './routes/friendRoutes';
 import morgan from 'morgan';
-
+import messageRouter from './routes/messageRoutes';
 dotenv.config();
 export const app = express();
 export const server = http.createServer(app);
@@ -20,6 +20,7 @@ app.use(express.json());
 app.use("/api/auth", userRouter);
 app.use("/api/friends", friendRouter);
 app.use("/api/protected", protectedRoute);
+app.use("/api/messages", messageRouter);
 app.use(morgan("dev")); // Log all requests to the console
 const start = async () => {
     try {

@@ -3,6 +3,7 @@ import API from "../config/APi";
 export const getMessages = async (senderId: string, receiverId: string) => {
     try {
         const response = await API.serverAPI_With_Auth.get(`/messages?senderId=${senderId}&receiverId=${receiverId}`);
+         console.log(response)
         return response.data;
     } catch (error) {
         console.error('Error fetching messages:', error);

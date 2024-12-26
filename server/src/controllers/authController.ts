@@ -6,7 +6,7 @@ import { validationResult } from 'express-validator';
 import config from "../auth/tokenGeneration/config";
 import tokenGenerator from "../auth/tokenGeneration/generator";
 import jwt from "jsonwebtoken";
-
+import { removePasswordFromUser } from "../Utils/helperFunctions";
 class AuthController implements Auth_Controller {
     async register(req: any, res: any, next: any): Promise<ModuleRes> {
         try {
@@ -55,14 +55,37 @@ class AuthController implements Auth_Controller {
         const decoded = jwt.verify(token, config.secret as any);
         const user_id = (decoded as any).id;
         const errors = validationResult(req);
+
         if (!errors.isEmpty()) {
             return res.status(400).json({ errors });
         }
         const user = await User.findById(user_id);
+
         if (!user) {
-            return res.status(404).json({ status: "error", message: "User not found." });
+            return res.status(204).json({ status: "error", message: "Invalid token." });
         }
         res.status(200).json({ code: 200, status: "success", message: "Token is valid." });
+    }
+    async getUserIdFromToken(req: any): Promise<string> {
+        const { authorization } = req.headers;
+        const token = authorization.split(" ")[1];
+        const decoded = jwt.verify(token, config.secret as any);
+        const user_id = (decoded as any).id;
+        if (!user_id) {
+            throw new Error("User id not found!");
+        }
+        return user_id;
+    }
+    async getUser(req: any, res: any, next: any): Promise<any> {
+        const { authorization } = req.headers;
+        const token = authorization.split(" ")[1];
+        const decoded = jwt.verify(token, config.secret as any);
+        const user_id = (decoded as any).id;
+        if (!user_id) {
+            res.status(404).json({ status: "error", message: "User id not found!" });
+        }
+        const user = await User.findById(user_id);
+        res.status(200).json({ status: "success", message: "User fetched successfully", user: removePasswordFromUser(user) });
     }
 }
 

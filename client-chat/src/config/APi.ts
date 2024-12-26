@@ -11,7 +11,6 @@ class ServerAPI {
             this.serverAPI_With_Auth = null;
             return;
         }
-        console.log("PROCESS ENV", process.env.REACT_APP_API_URL)
         this.serverAPI_With_Auth = axios.create({
             baseURL: `http://localhost:8080/api`,
             headers: {

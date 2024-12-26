@@ -163,9 +163,20 @@ export default function Sidebar() {
             >
               <MenuIcon />
             </IconButton>
-            <Typography variant="h6" noWrap component="div">
+            <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
               Namak
             </Typography>
+            <Box sx={{ display: { xs: 'flex', sm: 'none' } }}>
+              <IconButton color="inherit" onClick={handleDirectMessages}>
+                <EmailIcon />
+              </IconButton>
+              <IconButton color="inherit" onClick={handleFriends}>
+                <AccessibleForwardIcon />
+              </IconButton>
+              <IconButton color="inherit" onClick={() => handleLogout("approved")}>
+                <ExitToAppIcon />
+              </IconButton>
+            </Box>
           </Toolbar>
         </AppBar>
         <Drawer variant="permanent" open={open}>
@@ -176,249 +187,260 @@ export default function Sidebar() {
           </DrawerHeader>
           <Divider />
           <List>
-          <ListItem key={"Feed"} disablePadding sx={{ display: 'block' }}>
-                <ListItemButton
+            <ListItem key={"Feed"} disablePadding sx={{ display: 'block' }}>
+              <ListItemButton
+                sx={[
+                  {
+                    minHeight: 48,
+                    px: 2.5,
+                  },
+                  open
+                    ? {
+                        justifyContent: 'initial',
+                      }
+                    : {
+                        justifyContent: 'center',
+                      },
+                ]}
+              >
+                <ListItemIcon
                   sx={[
                     {
-                      minHeight: 48,
-                      px: 2.5,
+                      minWidth: 0,
+                      justifyContent: 'center',
                     },
                     open
                       ? {
-                          justifyContent: 'initial',
+                          mr: 3,
                         }
                       : {
-                          justifyContent: 'center',
+                          mr: 'auto',
                         },
                   ]}
                 >
-                  <ListItemIcon
-                    sx={[
-                      {
-                        minWidth: 0,
+                  <InboxIcon />
+                </ListItemIcon>
+                <ListItemText
+                  primary={"Feed"}
+                  sx={[
+                    open
+                      ? {
+                          opacity: 1,
+                        }
+                      : {
+                          opacity: 0,
+                        },
+                  ]}
+                />
+              </ListItemButton>
+            </ListItem>
+            <ListItem key={"Direct Messages"} disablePadding sx={{ display: 'block' }}>
+              <ListItemButton
+                sx={[
+                  {
+                    minHeight: 48,
+                    px: 2.5,
+                  },
+                  open
+                    ? {
+                        justifyContent: 'initial',
+                      }
+                    : {
                         justifyContent: 'center',
                       },
-                      open
-                        ? {
-                            mr: 3,
-                          }
-                        : {
-                            mr: 'auto',
-                          },
-                    ]}
-                  >
-                    <InboxIcon />
-                  </ListItemIcon>
-                  <ListItemText
-                    primary={"Feed"}
-                    sx={[
-                      open
-                        ? {
-                            opacity: 1,
-                          }
-                        : {
-                            opacity: 0,
-                          },
-                    ]}
-                  />
-                </ListItemButton>
-              </ListItem>
-          <ListItem key={"Direct Messages"} disablePadding sx={{ display: 'block' }}>
-                <ListItemButton
+                ]}
+                onClick={handleDirectMessages}
+              >
+                <ListItemIcon
                   sx={[
                     {
-                      minHeight: 48,
-                      px: 2.5,
+                      minWidth: 0,
+                      justifyContent: 'center',
                     },
                     open
                       ? {
-                          justifyContent: 'initial',
+                          mr: 3,
                         }
                       : {
-                          justifyContent: 'center',
+                          mr: 'auto',
                         },
                   ]}
-                  onClick={handleDirectMessages}
                 >
-                  <ListItemIcon
-                    sx={[
-                      {
-                        minWidth: 0,
+                  <EmailIcon />
+                </ListItemIcon>
+                <ListItemText
+                  primary={"Direct Messages"}
+                  sx={[
+                    open
+                      ? {
+                          opacity: 1,
+                        }
+                      : {
+                          opacity: 0,
+                        },
+                  ]}
+                />
+              </ListItemButton>
+            </ListItem>
+            <ListItem key={"Friends"} disablePadding sx={{ display: 'block' }}>
+              <ListItemButton
+                sx={[
+                  {
+                    minHeight: 48,
+                    px: 2.5,
+                  },
+                  open
+                    ? {
+                        justifyContent: 'initial',
+                      }
+                    : {
                         justifyContent: 'center',
                       },
-                      open
-                        ? {
-                            mr: 3,
-                          }
-                        : {
-                            mr: 'auto',
-                          },
-                    ]}
-                  >
-                    <EmailIcon />
-                  </ListItemIcon>
-                  <ListItemText
-                    primary={"Direct Messages"}
-                    sx={[
-                      open
-                        ? {
-                            opacity: 1,
-                          }
-                        : {
-                            opacity: 0,
-                          },
-                    ]}
-                  />
-                </ListItemButton>
-              </ListItem>
-          <ListItem key={"Friends"} disablePadding sx={{ display: 'block' }}>
-                <ListItemButton
+                ]}
+                onClick={handleFriends}
+              >
+                <ListItemIcon
                   sx={[
                     {
-                      minHeight: 48,
-                      px: 2.5,
+                      minWidth: 0,
+                      justifyContent: 'center',
                     },
                     open
                       ? {
-                          justifyContent: 'initial',
+                          mr: 3,
                         }
                       : {
-                          justifyContent: 'center',
+                          mr: 'auto',
                         },
                   ]}
-                  onClick= {handleFriends}
                 >
-                  <ListItemIcon
-                    sx={[
-                      {
-                        minWidth: 0,
-                        justifyContent: 'center',
-                      },
-                      open
-                        ? {
-                            mr: 3,
-                          }
-                        : {
-                            mr: 'auto',
-                          },
-                    ]}
-                  >
-                    <AccessibleForwardIcon />
-                  </ListItemIcon>
-                  <ListItemText
-                    primary={"Friends"}
-                    sx={[
-                      open
-                        ? {
-                            opacity: 1,
-                          }
-                        : {
-                            opacity: 0,
-                          },
-                    ]}
-                  />
-                </ListItemButton>
-              </ListItem>
+                  <AccessibleForwardIcon />
+                </ListItemIcon>
+                <ListItemText
+                  primary={"Friends"}
+                  sx={[
+                    open
+                      ? {
+                          opacity: 1,
+                        }
+                      : {
+                          opacity: 0,
+                        },
+                  ]}
+                />
+              </ListItemButton>
+            </ListItem>
           </List>
           <Divider />
           <List>
-              <ListItem key={"Account Settings"} disablePadding sx={{ display: 'block' }}>
-                <ListItemButton
+            <ListItem key={"Account Settings"} disablePadding sx={{ display: 'block' }}>
+              <ListItemButton
+                sx={[
+                  {
+                    minHeight: 48,
+                    px: 2.5,
+                  },
+                  open
+                    ? {
+                        justifyContent: 'initial',
+                      }
+                    : {
+                        justifyContent: 'center',
+                      },
+                ]}
+              >
+                <ListItemIcon
                   sx={[
                     {
-                      minHeight: 48,
-                      px: 2.5,
+                      minWidth: 0,
+                      justifyContent: 'center',
                     },
                     open
                       ? {
-                          justifyContent: 'initial',
+                          mr: 3,
                         }
                       : {
-                          justifyContent: 'center',
+                          mr: 'auto',
                         },
                   ]}
                 >
-                  <ListItemIcon
-                    sx={[
-                      {
-                        minWidth: 0,
-                        justifyContent: 'center',
-                      },
-                      open
-                        ? {
-                            mr: 3,
-                          }
-                        : {
-                            mr: 'auto',
-                          },
-                    ]}
-                  >
                   <SettingsIcon />
-                  </ListItemIcon>
-                  <ListItemText
-                    primary={"Account Settings"}
-                    sx={[
-                      open
-                        ? {
-                            opacity: 1,
-                          }
-                        : {
-                            opacity: 0,
-                          },
-                    ]}
-                  />
-                </ListItemButton>
-              </ListItem>
-              <ListItem key={"Logout"} disablePadding sx={{ display: 'block' }}>
-                <ListItemButton
+                </ListItemIcon>
+                <ListItemText
+                  primary={"Account Settings"}
+                  sx={[
+                    open
+                      ? {
+                          opacity: 1,
+                        }
+                      : {
+                          opacity: 0,
+                        },
+                  ]}
+                />
+              </ListItemButton>
+            </ListItem>
+            <ListItem key={"Logout"} disablePadding sx={{ display: 'block' }}>
+              <ListItemButton
+                sx={[
+                  {
+                    minHeight: 48,
+                    px: 2.5,
+                  },
+                  open
+                    ? {
+                        justifyContent: 'initial',
+                      }
+                    : {
+                        justifyContent: 'center',
+                      },
+                ]}
+                onClick={() => handleLogout("approved")}
+              >
+                <ListItemIcon
                   sx={[
                     {
-                      minHeight: 48,
-                      px: 2.5,
+                      minWidth: 0,
+                      justifyContent: 'center',
                     },
                     open
                       ? {
-                          justifyContent: 'initial',
+                          mr: 3,
                         }
                       : {
-                          justifyContent: 'center',
+                          mr: 'auto',
                         },
                   ]}
-                  onClick={() => handleLogout("approved")} 
                 >
-                  <ListItemIcon
-                    sx={[
-                      {
-                        minWidth: 0,
-                        justifyContent: 'center',
-                      },
-                      open
-                        ? {
-                            mr: 3,
-                          }
-                        : {
-                            mr: 'auto',
-                          },
-                    ]}
-                  >
-                  <ExitToAppIcon/>
-                  </ListItemIcon>
-                  <ListItemText
-                    primary={"Logout"}
-                    sx={[
-                      open
-                        ? {
-                            opacity: 1,
-                          }
-                        : {
-                            opacity: 0,
-                          },
-                    ]}
-                  />
-                </ListItemButton>
-              </ListItem>
+                  <ExitToAppIcon />
+                </ListItemIcon>
+                <ListItemText
+                  primary={"Logout"}
+                  sx={[
+                    open
+                      ? {
+                          opacity: 1,
+                        }
+                      : {
+                          opacity: 0,
+                        },
+                  ]}
+                />
+              </ListItemButton>
+            </ListItem>
           </List>
         </Drawer>
+        <Box sx={{ display: { xs: 'none', sm: 'flex' }, alignItems: 'center', ml: 2 }}>
+          <IconButton color="inherit" onClick={handleDirectMessages}>
+            <EmailIcon />
+          </IconButton>
+          <IconButton color="inherit" onClick={handleFriends}>
+            <AccessibleForwardIcon />
+          </IconButton>
+          <IconButton color="inherit" onClick={() => handleLogout("approved")}>
+            <ExitToAppIcon />
+          </IconButton>
+        </Box>
         <Box component="main" sx={{ flexGrow: 1 }}>
           <DrawerHeader />
           <Typography sx={{ marginBottom: 2 }}>

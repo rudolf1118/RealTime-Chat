@@ -12,4 +12,12 @@ router.get('/getFriendsList', (req, res, next) => {
   friendController.getFriendsList(req, res, next).catch(next);
 });
 
+router.delete('/removeFriend', (req, res, next) => {
+  friendController.deleteFriend(req, res, next).catch(next);
+});
+
+router.get('/getFriendById', (req, res, next) => {
+  friendController.getFriendById(req, res, next).catch(next);
+});
+
 export default router;

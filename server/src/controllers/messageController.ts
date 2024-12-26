@@ -13,12 +13,14 @@ class MessageController implements Message_Controller {
 
     async getMessages(req: any, res: any): Promise<any> {
         const { senderId, receiverId } = req.query;
+        console.log(senderId, receiverId)
         const messages = await Message.find({
             $or: [
                 { senderId: senderId, receiverId: receiverId },
                 { senderId: receiverId, receiverId: senderId }
             ]
         });
+        console.log(messages)
         res.json(messages);
     }
     

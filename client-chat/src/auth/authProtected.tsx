@@ -13,7 +13,6 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
     const token = localStorage.getItem('token');
     const [isLoading, setIsLoading] = useState(true);
     const [isValid, setIsValid] = useState(false);
-
     useEffect(() => {
         const tokenChecker = async (token: string) => {
             const request = await validateToken(token);
@@ -21,11 +20,11 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
             setIsLoading(false);
         };
         if (token) {
-            tokenChecker(token);
+            (async () => await tokenChecker(token))();
         } else {
             setIsLoading(false);
         }
-    }, [token]);
+    }, []);
 
     if (isLoading) {
         return (
@@ -37,7 +36,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
             </Box>
         );
     }
-
+    if (!isValid) localStorage.removeItem('token');
     return isValid ? <>{children}</> : <Navigate to="/login" replace />;
 };
 
