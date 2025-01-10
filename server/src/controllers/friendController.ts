@@ -103,22 +103,22 @@ class FriendController implements Friend_Controller {
             res.status(500).json({ status: "error", message: error.message });  
         }
     }
-    async sendFriendRequest (req:any, res:any, next:any): Promise<ModuleRes> {
+    async sendFriendRequest (userInfo:any, res:any, next:any): Promise<ModuleRes> {
         try {
-            const { receiverId } = req.body;
-            const user_id = await AuthController.getUserIdFromToken(req);
+            const { receiverId } = userInfo;
+            const user_id = await AuthController.getUserIdFromToken(userInfo);
             const user = await User.findById(user_id);
             const receiver = await User.findById(receiverId);
             console.log("user", user);
             console.log("receiver", receiver);
             if (!user || !receiver) {
-                return res.status(404).json({ status: "error", message: `User not found with id ${!receiverId ? user_id : receiverId}` });
+                return ({ status: "error", message: `User not found with id ${!receiverId ? user_id : receiverId}` });
             }
             if (user.friendRequests.some((request:any) => request.receiverId === receiverId)) {
-                return res.status(400).json({ status: "error", message: "Friend request already sent." });
+                return ({ status: "error", message: "Friend request already sent." });
             }
             if (receiver.friendRequests.some((request:any) => request.senderId === user_id)) {
-                return res.status(400).json({ status: "error", message: "Friend request already sent." });
+                return ({ status: "error", message: "Friend request already sent." });
             }
             console.log("user_id", user_id);
             console.log("receiverId", receiverId);
@@ -131,10 +131,10 @@ class FriendController implements Friend_Controller {
             receiver.friendRequests.push({senderId:user_id, status:"pending"});
             await friendRequest.save();
             await receiver.save();
-            res.status(200).json({ status: "success", message: "Friend request sent successfully" });
+            return ({ status: "success", message: "Friend request sent successfully" });
         } catch (error) {
             console.log("error in friend controller", error);
-            res.status(500).json({ status: "error", message: error?.message || error });  
+            return({ status: "error", message: error?.message || error });  
         }
     }
     async getFriendRequests(req:any, res:any, next:any): Promise<ModuleRes | any> {

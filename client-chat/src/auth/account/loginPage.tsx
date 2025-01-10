@@ -2,9 +2,9 @@ import React, { useState } from "react";
 import {Box, Button, Checkbox, Container, FormControlLabel, Grid, Link, Paper, TextField, Typography} from "@mui/material";
 import { Link as RouterLink } from 'react-router-dom';
 import axios from "axios";
-import { loginUser } from "./authAPI";
+import { loginUser } from "../authAPI";
 import { useNavigate } from 'react-router-dom';
-import API from "../config/APi";
+import API from "../../config/APi";
 
 const LoginPage = (props: { handleCreds: (user: any) => void }) => {
     const [email, setEmail] = useState('');

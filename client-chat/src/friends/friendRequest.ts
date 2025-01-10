@@ -23,3 +23,11 @@ export const sendFriendRequest = async (userInfo: string) => {
         }
     });
 }
+
+export const getFriendRequests = async () => {
+    socket.on('friendRequests', (requests) => {
+        return requests;
+        
+    });
+    return [];
+}

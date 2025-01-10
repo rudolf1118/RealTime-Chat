@@ -80,7 +80,7 @@ export default function BackgroundLetterAvatars(props: { username: string; onlin
         variant="dot"
         online={props.online}
       >
-        <Avatar {...stringAvatar(`${props.username || 'Andrew Petrov'}`)} />
+        <Avatar {...stringAvatar(`${props.username || '?'}`)} />
       </StyledBadge>
     </Stack>
   );

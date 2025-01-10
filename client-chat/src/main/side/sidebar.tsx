@@ -22,7 +22,7 @@ import EmailIcon from '@mui/icons-material/Email';
 import SettingsIcon from '@mui/icons-material/Settings';
 import ExitToAppIcon from '@mui/icons-material/ExitToApp';
 import { useNavigate } from 'react-router-dom';
-import Logout from '../auth/logout';
+import Logout from '../../auth/account/logout';
 import { useState } from 'react';
 import { Container, Modal } from '@mui/material';
 

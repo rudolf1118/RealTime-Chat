@@ -1,6 +1,6 @@
 import React, { useState , useEffect } from 'react';
 import { Navigate } from 'react-router-dom';
-import { validateToken } from './authAPI';
+import { validateToken } from '../authAPI';
 import { CircularProgress } from '@mui/material';
 import { Box } from '@mui/material';
 import { Typography } from '@mui/material';

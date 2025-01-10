@@ -1,7 +1,8 @@
-import { TextField } from "@mui/material";
+import { Button, TextField } from "@mui/material";
 import { useState } from "react";
 import { Container } from "@mui/material";
 import { sendFriendRequest } from "./friendRequest";
+import FriendRequestList from "./friendRequestList";
 
 const AddFriend = ({ handlerNewFriend }: { handlerNewFriend: any }) => {
     const [friend, setFriend] = useState("");
@@ -10,7 +11,7 @@ const AddFriend = ({ handlerNewFriend }: { handlerNewFriend: any }) => {
         handlerNewFriend(newFriend);
     }
     return (
-        <Container sx={{ display: "flex", flexDirection: "column", alignItems: "center", width: "100%"}}>
+        <Container sx={{ display: "flex", alignItems: "center", width: "100%"}}>
             <TextField
                 label="Add Friend"
                 variant="outlined"
@@ -24,6 +25,9 @@ const AddFriend = ({ handlerNewFriend }: { handlerNewFriend: any }) => {
                     }
                 }}
             />
+            <Button onClick={() => <FriendRequestList/>} >
+                View Friend Requests
+            </Button>
         </Container>
     )
 }
