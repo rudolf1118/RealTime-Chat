@@ -1,4 +1,5 @@
 import API from "../config/APi";
+
 export const registerUser = async (user: {username: string, email: string, password: string}): Promise<any> => {
         try {
         const request = await API.serverAPI_WO_Auth.post(`/auth/signup`, {

@@ -108,20 +108,33 @@ class FriendController implements Friend_Controller {
             const { receiverId } = req.body;
             const user_id = await AuthController.getUserIdFromToken(req);
             const user = await User.findById(user_id);
-            if (!user) {
-                return res.status(404).json({ status: "error", message: "User not found." });
+            const receiver = await User.findById(receiverId);
+            console.log("user", user);
+            console.log("receiver", receiver);
+            if (!user || !receiver) {
+                return res.status(404).json({ status: "error", message: `User not found with id ${!receiverId ? user_id : receiverId}` });
             }
+            if (user.friendRequests.some((request:any) => request.receiverId === receiverId)) {
+                return res.status(400).json({ status: "error", message: "Friend request already sent." });
+            }
+            if (receiver.friendRequests.some((request:any) => request.senderId === user_id)) {
+                return res.status(400).json({ status: "error", message: "Friend request already sent." });
+            }
+            console.log("user_id", user_id);
+            console.log("receiverId", receiverId);
             const friendRequest = new FriendRequest({
-                senderId: user._id,
+                senderId: user_id,
                 receiverId: receiverId,
                 status: "pending"
             });
+            console.log("friendRequest", friendRequest);
+            receiver.friendRequests.push({senderId:user_id, status:"pending"});
             await friendRequest.save();
+            await receiver.save();
             res.status(200).json({ status: "success", message: "Friend request sent successfully" });
         } catch (error) {
-            next();
             console.log("error in friend controller", error);
-            res.status(500).json({ status: "error", message: error.message });  
+            res.status(500).json({ status: "error", message: error?.message || error });  
         }
     }
     async getFriendRequests(req:any, res:any, next:any): Promise<ModuleRes | any> {
@@ -132,7 +145,7 @@ class FriendController implements Friend_Controller {
         } catch (error) {
             next();
             console.log("error in friend controller", error);
-            res.status(500).json({ status: "error", message: error.message });  
+            res.status(500).json({ status: "error", message: error?.message || error });  
         }
     }
 async acceptFriendRequest(req:any, res:any, next:any): Promise<ModuleRes | any> {
@@ -144,7 +157,7 @@ async acceptFriendRequest(req:any, res:any, next:any): Promise<ModuleRes | any> 
             }
             friendRequest.status = "accepted";
             await friendRequest.save();
-            res.status(200).json({ status: "success", message: "Friend request accepted successfully" });
+            return { status: "success", message: "Friend request accepted successfully" };
         } catch (error) {
             next();
             console.log("error in friend controller", error);

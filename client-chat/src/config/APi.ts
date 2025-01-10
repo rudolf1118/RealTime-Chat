@@ -3,16 +3,17 @@ import axios from 'axios';
 class ServerAPI {
     serverAPI_WO_Auth: axios.AxiosInstance;
     serverAPI_With_Auth: axios.AxiosInstance;
+    url:string;
 
-    private initializeAPI() {
-        const token = localStorage.getItem('token');
+    public async initializeAPI() {
+        const token = await localStorage.getItem('token');
         if (!token) {
             console.warn('No token found, initializing without authentication.');
             this.serverAPI_With_Auth = null;
-            return;
+            return ;
         }
         this.serverAPI_With_Auth = axios.create({
-            baseURL: `http://localhost:8080/api`,
+            baseURL: this.url,
             headers: {
                 'Authorization': `Bearer ${token}`,
                 'Content-Type': 'application/json',
@@ -20,16 +21,16 @@ class ServerAPI {
         });
     }
 
-    constructor() {
+    constructor(url:string) {
         try {
-            this.initializeAPI();
-
+            this.url = url;
             this.serverAPI_WO_Auth = axios.create({
-                baseURL: `http://localhost:8080/api`,
+                baseURL: url,
                 headers: {
                     'Content-Type': 'application/json',
                 },
             });
+            this.initializeAPI();
         } catch (error) {
             console.error('Error creating serverAPI:', error);
         }
@@ -37,4 +38,4 @@ class ServerAPI {
 }
 
 
-export default new ServerAPI;
+export default new ServerAPI('http://localhost:8080/api');

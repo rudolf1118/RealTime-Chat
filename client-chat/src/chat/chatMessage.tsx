@@ -5,13 +5,20 @@ import ChatWith from './chatWith';
 
 interface Message {
     _id?: string;
-    receiverId: string;
-    senderId: string;
+    receiver: {
+        username: string;
+        id: string;
+    };
+    sender: {
+      username: string;
+      id: string;
+    };
     text: string;
     timestamp: string;
   }
 
-const ChatMessage: React.FC<{ messages: any }> = (props) => {
+const ChatMessage: React.FC<{ messages: any, senderName: string }> = (props) => {
+  console.log(props.messages);
     return (
         <Paper
         elevation={3}
@@ -28,7 +35,7 @@ const ChatMessage: React.FC<{ messages: any }> = (props) => {
         <List>
           {props.messages.map((msg, index) => (
             <ListItem key={index}>
-              <ListItemText primary={`${msg.senderId}: ${msg.text}`} />
+              <ListItemText primary={`${props.senderName}: ${msg.text}`} />
             </ListItem>
           ))}
         </List>

@@ -73,7 +73,7 @@ const Chat: React.FC<{ username?: string, online?:boolean, messages?:Message[] }
         <Container sx={{ display: "flex", flexDirection: "column", justifyContent: "space-between", height: "100vh" }}>
             <Box display="flex" flexDirection="column">
                 <ChatWith username={receiver.username || ''} online={receiver.online || false} />
-                <ChatMessage messages={chat} />
+                <ChatMessage messages={chat} senderName={sender.username || ''} />
                 <ChatInput onSendMessage={sendMessage} />
             </Box>
         </Container>

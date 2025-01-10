@@ -4,6 +4,7 @@ import { Link as RouterLink } from 'react-router-dom';
 import axios from "axios";
 import { loginUser } from "./authAPI";
 import { useNavigate } from 'react-router-dom';
+import API from "../config/APi";
 
 const LoginPage = (props: { handleCreds: (user: any) => void }) => {
     const [email, setEmail] = useState('');
@@ -36,7 +37,8 @@ const LoginPage = (props: { handleCreds: (user: any) => void }) => {
             }
             const { token } = response?.data;
 
-            localStorage.setItem('token', token);
+            await localStorage.setItem('token', token);
+            await API.initializeAPI();
             const { user_id } = response.data;
             props.handleCreds(user_id);
 

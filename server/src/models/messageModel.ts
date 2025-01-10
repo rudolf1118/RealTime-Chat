@@ -1,8 +1,14 @@
 import { Schema, model } from 'mongoose';
 
 const Messages = new Schema({
-    senderId: { type: String, required: true },
-    receiverId: { type: String, required: true },
+    sender: { 
+        id: { type: String, required: true },
+        username: { type: String, required: true }
+    },
+    receiver: { 
+        id: { type: String, required: true },
+        username: { type: String, required: true }
+    },
     text: { type: String, required: true },
     timestamp: { type: Date, default: Date.now },
 });

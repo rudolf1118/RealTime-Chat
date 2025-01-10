@@ -2,8 +2,6 @@ import { Box, Container, TableCell, TableHead, TableRow, Table, TableBody, Butto
 import React, { useEffect, useState } from 'react';
 import { getFriendList, removeFriend } from "./friendsAPI";
 import AddFriend from "./addFriend";
-import { socket } from '../socket/connection';
-
 interface FriendListProps {
   user_id: string;
 }
@@ -23,6 +21,8 @@ const FriendList: React.FC<any> = ( ) => {
     useEffect(() => {
         const fetchFriends = async () => {
             const fetchedFriends = await getFriendList();
+            console.log(fetchedFriends);
+            
             fetchedFriends.length > 0 ? setFriendsList(fetchedFriends) : setFriendsList([]);
         }
         (async () => await fetchFriends())();

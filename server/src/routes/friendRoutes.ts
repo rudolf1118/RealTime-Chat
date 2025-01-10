@@ -1,6 +1,6 @@
 import Router from 'express';
 import friendController from '../controllers/friendController';
-import authMiddleware from '../auth/middlewares/authMiddleware';
+import authMiddleware from '../auth/middlewares/authMiddlewareREST';
 
 const router = Router();
 router.use(authMiddleware);
@@ -18,6 +18,14 @@ router.delete('/removeFriend', (req, res, next) => {
 
 router.get('/getFriendById', (req, res, next) => {
   friendController.getFriendById(req, res, next).catch(next);
+});
+
+router.post('/sendFriendRequest', (req, res, next) => {
+  friendController.sendFriendRequest(req, res, next).catch(next);
+});
+
+router.post('/acceptFriendRequest', (req, res, next) => {
+  friendController.acceptFriendRequest(req, res, next).catch(next);
 });
 
 export default router;

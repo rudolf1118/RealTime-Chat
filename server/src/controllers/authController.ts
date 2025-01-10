@@ -11,7 +11,6 @@ class AuthController implements Auth_Controller {
     async register(req: any, res: any, next: any): Promise<ModuleRes> {
         try {
             const { username, email, password } = req.body;
-            console.log(req.body);
             const errors = validationResult(req);
             if (!errors.isEmpty()) {
                 return res.status(400).json({ errors });
@@ -38,9 +37,7 @@ class AuthController implements Auth_Controller {
             if (!isPasswordValid) {
                 return res.status(401).json({ status: "error", message: "Invalid password." });
             }
-            console.log(user);
             const token = tokenGenerator(user._id.toString(), user.role);
-            console.log(token);
             return res.status(200).json({ status: "success", message: "Login successful.", token, user_id: user._id });
         } catch (error) {
             next(error);

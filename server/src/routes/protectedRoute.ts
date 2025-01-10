@@ -1,5 +1,5 @@
 import Router from 'express';
-import verifyToken from '../auth/middlewares/authMiddleware';
+import verifyToken from '../auth/middlewares/authMiddlewareREST';
 
 const protectedRouter = Router();
 protectedRouter.get('/', verifyToken, (req: any, res: any) => {

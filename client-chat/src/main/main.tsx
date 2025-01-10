@@ -5,10 +5,7 @@ import RegistrationPage from '../auth/registrationPage';
 import ProtectedRoute from '../auth/authProtected';
 import LandingPage from './landing';
 import Side from './sideComponents';
-import Chat from '../chat/chatService';
 import AlreadySignedIn from '../auth/alreadySignedIn';
-import Logout from '../auth/logout';
-import ChatList from '../chat/chatList';
 
 const Main: React.FC = () => {
   const [userId, setUserId] = useState<string | null>(null);
@@ -16,7 +13,7 @@ const Main: React.FC = () => {
   const handleCreds = (user_id:any) => {
     setUserId(user_id);
   }
-  console.log("THIS IS USER_ID", userId);
+
     return (
         <BrowserRouter>
             <Routes>

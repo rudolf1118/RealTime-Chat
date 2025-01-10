@@ -12,24 +12,28 @@ class MessageController implements Message_Controller {
     }
 
     async getMessages(req: any, res: any): Promise<any> {
-        const { senderId, receiverId } = req.query;
-        console.log(senderId, receiverId)
-        const messages = await Message.find({
-            $or: [
-                { senderId: senderId, receiverId: receiverId },
-                { senderId: receiverId, receiverId: senderId }
-            ]
-        });
-        console.log(messages)
-        res.json(messages);
+        try {
+            const { senderId, receiverId } = req.query;
+            const messages = await Message.find({
+                $or: [
+                    { 'receiver.id': senderId, 'sender.id': receiverId },
+                    { 'receiver.id': receiverId, 'sender.id': senderId }
+                ]
+            });
+            console.log(messages);
+            res.json(messages);
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({ message: 'Error fetching messages' });
+        }
     }
     
     async createMessage(messageData: any, socket: any): Promise<any> {
         try {
             const { senderId, receiverId, text, timestamp } = messageData;
             const message = new Message({ 
-                senderId: senderId, 
-                receiverId: receiverId, 
+                sender: { id: senderId, username: senderId }, 
+                receiver: { id: receiverId, username: receiverId }, 
                 text, 
                 timestamp 
             });

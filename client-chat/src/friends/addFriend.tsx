@@ -1,12 +1,12 @@
 import { TextField } from "@mui/material";
 import { useState } from "react";
 import { Container } from "@mui/material";
-import { addFriend } from "./friendsAPI";
+import { sendFriendRequest } from "./friendRequest";
 
 const AddFriend = ({ handlerNewFriend }: { handlerNewFriend: any }) => {
-    const [friendName, setFriendName] = useState("");
-    const addingNewFriend = async (friendName: string) => {
-        const newFriend = await addFriend(friendName);
+    const [friend, setFriend] = useState("");
+    const addingNewFriend = async (friend: string) => {
+        const newFriend = await sendFriendRequest(friend);
         handlerNewFriend(newFriend);
     }
     return (
@@ -16,11 +16,11 @@ const AddFriend = ({ handlerNewFriend }: { handlerNewFriend: any }) => {
                 variant="outlined"
                 fullWidth
                 margin="normal"
-                onChange={(e) => setFriendName(e.target.value)}
+                onChange={(e) => setFriend(e.target.value)}
                 onKeyDown={(e) => {
                     if (e.key === 'Enter') {
-                        addingNewFriend(friendName);
-                        setFriendName("");
+                        addingNewFriend(friend);
+                        setFriend("");
                     }
                 }}
             />

@@ -11,3 +11,15 @@ export const rejectFriendRequest = async (userId: string, username: string) => {
 export const friendAccepted = async (userId: string, username: string) => {
     socket.emit('friendAccepted', { userId, username });
 }
+
+export const sendFriendRequest = async (userInfo: string) => {
+    socket.emit('sendFriendRequest', userInfo);
+
+    socket.on('friendRequestResponse', (response) => {
+        if (response.success) {
+            console.log('Friend request sent successfully:', response.message);
+        } else {
+            console.error('Error sending friend request:', response.error);
+        }
+    });
+}

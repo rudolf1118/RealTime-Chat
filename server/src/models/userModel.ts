@@ -26,6 +26,14 @@ const Users = new Schema({
         type:Array,
         default: []
     },
+    friendRequests: {
+        type: [{
+            senderId: { type: String, required: true },
+            status: { type: String, enum: ['pending', 'accepted', 'declined'], default: 'pending' },
+            createdAt: { type: Date, default: Date.now }
+        }],
+        default: []
+    },
     role: {
         type: String,
         enum: ['user', 'admin'],
