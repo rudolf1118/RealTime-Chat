@@ -19,7 +19,7 @@ const FriendRequestList = () => {
           <TableBody>
             {requestsList?.map((friend: any, index: number) => (
               <TableRow key={friend._id}>
-                <TableCell align="center" sx={{ display: { xs: 'block', md: 'table-cell', alignItems: 'center' } }}>{friend.username}</TableCell>
+                <TableCell align="center" sx={{ display: { xs: 'block', md: 'table-cell', alignItems: 'center' } }}>{friend?.username}</TableCell>
                 <TableCell align="center" sx={{ display: { xs: 'block', md: 'table-cell' } }}>{friend.email}</TableCell>
                 <TableCell align="center" sx={{ display: { xs: 'block', md: 'table-cell' } }}>
                   <Button 
