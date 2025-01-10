@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
-import LoginPage from '../auth/loginPage';
-import RegistrationPage from '../auth/registrationPage';
+import LoginPage from '../auth/account/loginPage';
+import RegistrationPage from '../auth/account/registrationPage';
 import ProtectedRoute from '../auth/authProtected';
 import LandingPage from './landing';
-import Side from './sideComponents';
-import AlreadySignedIn from '../auth/alreadySignedIn';
+import Side from './side/sideComponents';
+import AlreadySignedIn from '../auth/account/alreadySignedIn';
 
 const Main: React.FC = () => {
   const [userId, setUserId] = useState<string | null>(null);

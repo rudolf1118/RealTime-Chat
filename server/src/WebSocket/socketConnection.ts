@@ -20,7 +20,7 @@ export function socketConnection() {
     io.use(verifySocketToken);
     io.on('connection', (socket) => {
         console.log('User connected:', socket.id);
-
+        const token = socket.handshake.auth.token; 
         socket.on('joinRoom', (userId: string) => {
             socket.join(userId);
             console.log(`User ${userId} joined their room`);
@@ -36,7 +36,8 @@ export function socketConnection() {
         });
 
         socket.on('sendFriendRequest', async (userInfo: string) => {
-            const request = await FriendController.sendFriendRequest(userInfo, socket, io);
+            console.log(userInfo);
+            const request = await FriendController.sendFriendRequest({userInfo, authorization: { token }}, socket, io);
             socket.emit('friendRequestResponse', { request });
         });
 

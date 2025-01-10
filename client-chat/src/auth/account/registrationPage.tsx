@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import {Box, Button, Checkbox, Container, FormControlLabel, Grid, Link, Paper, TextField, Typography} from "@mui/material";
 import { Link as RouterLink } from 'react-router-dom';
-import { registerUser } from './authAPI';
+import { registerUser } from '../authAPI';
 import { useNavigate } from 'react-router-dom';
 
 const RegistrationPage = () => {

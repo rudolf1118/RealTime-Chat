@@ -2,7 +2,7 @@ import { Box, Button, Typography } from "@mui/material";
 import { Container } from "@mui/material";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import API from "../config/APi";
+import API from "../../config/APi";
 
 const Logout = ({handleLogout}:{handleLogout:any}) => {
     const navigate = useNavigate();
