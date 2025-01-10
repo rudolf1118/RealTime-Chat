@@ -12,22 +12,29 @@ export const friendAccepted = async (userId: string, username: string) => {
     socket.emit('friendAccepted', { userId, username });
 }
 
-export const sendFriendRequest = async (userInfo: string) => {
-    socket.emit('sendFriendRequest', userInfo);
+export const sendFriendRequest = async (userInfo: string): Promise<any> => {
+    socket.emit('sendFriendRequest', userInfo); 
+    let status: any;
 
-    socket.on('friendRequestResponse', (response) => {
-        if (response.success) {
-            console.log('Friend request sent successfully:', response.message);
-        } else {
-            console.error('Error sending friend request:', response.error);
-        }
+    status = await new Promise((resolve) => {
+        socket.on('friendRequestResponse', (response) => {
+            const { request } = response;
+            if (request.status === "success") {
+                console.log('Friend request sent successfully:', request.message);
+                resolve(request);
+            } else if (request.status === "error") {
+                console.error('Error sending friend request:', request.message);
+                resolve(request);
+            }
+        });
     });
+    return status;
 }
 
 export const getFriendRequests = async () => {
     socket.on('friendRequests', (requests) => {
         return requests;
-        
+
     });
     return [];
 }

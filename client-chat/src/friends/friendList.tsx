@@ -15,9 +15,6 @@ const FriendList: React.FC<any> = ( ) => {
         await removeFriend(friendsList[index]._id);
         setFriendsList(filterFriends);
     }
-    const handlerNewFriend = async (newFriend:any) => {
-        setFriendsList([...friendsList, newFriend]);
-    }
     useEffect(() => {
         const fetchFriends = async () => {
             const fetchedFriends = await getFriendList();
@@ -31,13 +28,13 @@ const FriendList: React.FC<any> = ( ) => {
   return (
     <Container sx={{ alignItems: "center", display: "flex", flexDirection: "column", height: "100vh" }} maxWidth='sm'>
       <Box>
-      <AddFriend handlerNewFriend={handlerNewFriend} />
+      <AddFriend />
         <Table sx={{ width: "100%", mt: "10px" }}>
           <TableBody>
             {friendsList?.map((friend: any, index: number) => (
-              <TableRow key={friend._id}>
-                <TableCell align="center" sx={{ display: { xs: 'block', md: 'table-cell', alignItems: 'center' } }}>{friend.username}</TableCell>
-                <TableCell align="center" sx={{ display: { xs: 'block', md: 'table-cell' } }}>{friend.email}</TableCell>
+              <TableRow key={friend?._id || "1"}>
+                <TableCell align="center" sx={{ display: { xs: 'block', md: 'table-cell', alignItems: 'center' } }}>{friend?.username}</TableCell>
+                <TableCell align="center" sx={{ display: { xs: 'block', md: 'table-cell' } }}>{friend?.email}</TableCell>
                 <TableCell align="center" sx={{ display: { xs: 'block', md: 'table-cell' } }}>
                   <Button 
                       sx={{ width: "100px", height: "30px", fontSize: "8px" }} 
