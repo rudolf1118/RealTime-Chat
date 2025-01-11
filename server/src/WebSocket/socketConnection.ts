@@ -37,7 +37,7 @@ export function socketConnection() {
 
         socket.on('sendFriendRequest', async (userInfo: string) => {
             console.log(userInfo);
-            const request = await FriendController.sendFriendRequest({userInfo, authorization: { token }}, socket, io);
+            const request = await FriendController.sendFriendRequest({ userInfo, authorization: token }, socket, io);
             socket.emit('friendRequestResponse', { request });
         });
 

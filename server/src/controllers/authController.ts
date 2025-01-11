@@ -64,9 +64,9 @@ class AuthController implements Auth_Controller {
         res.status(200).json({ code: 200, status: "success", message: "Token is valid." });
     }
     async getUserIdFromToken(req: any): Promise<string> {
-        console.log("req", req);
-        const { authorization } = req.headers;
-        const token = authorization.split(" ")[1];
+        const { authorization } = req?.isSocket ? req.userInfo : req.headers;
+        const token = authorization.split(" ")[1] || authorization;
+        console.log(token)
         const decoded = jwt.verify(token, config.secret as any);
         const user_id = (decoded as any).id;
         if (!user_id) {

@@ -5,7 +5,7 @@ import { ModuleRes } from "../types/UtilTypes";
 import { validationResult } from 'express-validator';
 import jwt from "jsonwebtoken";
 import AuthController from "./authController";
-import { removePasswordFromUser } from "../Utils/helperFunctions";
+import { isValidEmail, removePasswordFromUser } from "../Utils/helperFunctions";
 import FriendRequest from "../models/friendRequestModel";
 import { Server } from 'socket.io';
 
@@ -105,32 +105,29 @@ class FriendController implements Friend_Controller {
     }
     async sendFriendRequest (userInfo:any, res:any, next:any): Promise<ModuleRes> {
         try {
-            const { receiverId } = userInfo;
-            const user_id = await AuthController.getUserIdFromToken(userInfo);
+            console.log(userInfo.userInfo)
+            const user_id = await AuthController.getUserIdFromToken({userInfo, isSocket: true});
             const user = await User.findById(user_id);
-            const receiver = await User.findById(receiverId);
-            console.log("user", user);
-            console.log("receiver", receiver);
+            const receiver = await User.findOne({ $or: [{ username: userInfo.userInfo }, { email: userInfo.userInfo }] });
             if (!user || !receiver) {
-                return ({ status: "error", message: `User not found with id ${!receiverId ? user_id : receiverId}` });
+                return ({ status: "error", message: `User not found with id ${!userInfo ? user_id : userInfo}` });
             }
-            if (user.friendRequests.some((request:any) => request.receiverId === receiverId)) {
+            if (user.friendRequests.some((request:any) => request.receiverId === receiver._id)) {
                 return ({ status: "error", message: "Friend request already sent." });
             }
             if (receiver.friendRequests.some((request:any) => request.senderId === user_id)) {
                 return ({ status: "error", message: "Friend request already sent." });
             }
-            console.log("user_id", user_id);
-            console.log("receiverId", receiverId);
             const friendRequest = new FriendRequest({
-                senderId: user_id,
-                receiverId: receiverId,
+                senderId: user._id,
+                receiverId: receiver._id,
                 status: "pending"
             });
-            console.log("friendRequest", friendRequest);
             receiver.friendRequests.push({senderId:user_id, status:"pending"});
             await friendRequest.save();
             await receiver.save();
+            console.log("friendRequest", friendRequest);
+            console.log("Friend request sent successfully");
             return ({ status: "success", message: "Friend request sent successfully" });
         } catch (error) {
             console.log("error in friend controller", error);
