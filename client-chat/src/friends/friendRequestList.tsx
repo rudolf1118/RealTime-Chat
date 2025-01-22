@@ -1,6 +1,6 @@
 import { Button, Container, TableCell, TableRow, Table, TableBody } from "@mui/material";
 import { useEffect, useState } from "react";
-import { getFriendRequests } from "./friendRequest";
+import { getFriendRequests } from "./friendRequestAPI";
 
 const FriendRequestList = () => {
     const [requestsList, setRequestsList] = useState<any[]>([]);

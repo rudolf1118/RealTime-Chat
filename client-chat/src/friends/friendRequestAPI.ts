@@ -31,6 +31,17 @@ export const sendFriendRequest = async (userInfo: string): Promise<any> => {
     return status;
 }
 
+export const receiveFriendRequest = async (userInfo: string): Promise<any> => {
+    socket.on('receiveFriendRequest', (response) => {
+        const { request } = response;
+        if (request.status === "success") {
+            console.log('Friend request sent successfully:', request.message);
+        } else if (request.status === "error") {
+            console.error('Error sending friend request:', request.message);
+        }
+    });
+}
+
 export const getFriendRequests = async () => {
     socket.on('friendRequests', (requests) => {
         return requests;
