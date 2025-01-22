@@ -1,6 +1,9 @@
 export interface Message_Controller {
     getMessages(req: Request, res: Response): Promise<any>;
     createMessage(messageData: any, socket: any): Promise<any>;
+    setSocket(socket: Server): void;
+    checkingRedisCache(senderId: string, receiverId: string): Promise<any>;
+    cachingMessagesToRedis(toCache: any, senderId: string, receiverId: string): Promise<any>;
 }
 
 export interface Auth_Controller {

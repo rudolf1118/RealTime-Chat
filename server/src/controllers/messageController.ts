@@ -3,6 +3,8 @@ import { validationResult } from 'express-validator';
 import { Server } from 'socket.io';
 import Message from '../models/messageModel';
 import { Message_Controller } from '../types/Controllers';
+import { redisClient } from "../server";
+
 
 class MessageController implements Message_Controller {
     private io: Server | null = null;
@@ -11,16 +13,28 @@ class MessageController implements Message_Controller {
         this.io = socket;
     }
 
+    constructor() {
+        this.getMessages = this.getMessages.bind(this);
+        this.createMessage = this.createMessage.bind(this);
+        this.checkingRedisCache = this.checkingRedisCache.bind(this);
+        this.cachingMessagesToRedis = this.cachingMessagesToRedis.bind(this);
+    }
+
     async getMessages(req: any, res: any): Promise<any> {
         try {
             const { senderId, receiverId } = req.query;
+            const statusOfCaching = await this.checkingRedisCache(senderId, receiverId);
+            console.log(`Redis cache status: ${statusOfCaching.status}`);
+            if (statusOfCaching.status === "already cached") {
+                return res.json({messages: JSON.parse(statusOfCaching.data)});
+            }
             const messages = await Message.find({
                 $or: [
                     { 'receiver.id': senderId, 'sender.id': receiverId },
                     { 'receiver.id': receiverId, 'sender.id': senderId }
                 ]
             });
-            console.log(messages);
+            await this.cachingMessagesToRedis(messages, senderId, receiverId);
             res.json(messages);
         } catch (error) {
             console.error(error);
@@ -48,5 +62,37 @@ class MessageController implements Message_Controller {
             return { message: 'Error posting message' };
         }
     }
+
+    async checkingRedisCache(senderId:string, receiverId:string): Promise<any> { 
+        try {
+            let cachedMessages = await redisClient.get(`${senderId}_${receiverId}_messages`);
+            if (!cachedMessages) {
+                cachedMessages = await redisClient.get(`${receiverId}_${senderId}_messages`);
+            }
+            if (cachedMessages) {
+                return({status: "already cached", data: cachedMessages});
+            }
+            return({status: "not cached", data: null});
+        } catch (error) {
+            console.log("error in caching friends to redis", error);
+            throw error;
+        }
+    }
+
+    async cachingMessagesToRedis(toCache:any, senderId:string, receiverId:string): Promise<any> { 
+        try {
+            const cachedMessages = await redisClient.get(`${senderId}_${receiverId}_messages`);
+            if (cachedMessages) {
+                return({status: "already cached", message: `Messages already cached, id: ${senderId}_${receiverId}`});
+            }
+
+            await redisClient.setEx(`${senderId}_${receiverId}_messages`, parseInt(process.env.REDIS_EXPIRE_TIME), JSON.stringify(toCache));
+            console.log("cached messages", toCache);
+            return toCache;
+        } catch (error) {
+            console.log("error in caching friends to redis", error);
+            throw error;
+        }
+    }
 }
-export default new MessageController;
+export default new MessageController();
