@@ -8,13 +8,20 @@ import AuthController from "./authController";
 import { isValidEmail, removePasswordFromUser } from "../Utils/helperFunctions";
 import FriendRequest from "../models/friendRequestModel";
 import { Server } from 'socket.io';
+import { redisClient } from "../server";
+import { promisify } from 'util';
 
 class FriendController implements Friend_Controller {
     private io: Server | null = null;
+    private getAsync: any;
 
     setSocket(socket: Server) {
         this.io = socket;
     }
+
+    // constructor() {
+    //     this.getAsync = promisify(redisClient.get).bind(redisClient);
+    // }
 
     async addFriend(req: any, res: any, next: any): Promise<ModuleRes> {
         try {
@@ -70,11 +77,18 @@ class FriendController implements Friend_Controller {
             if (!user) {
                 return res.status(404).json({ status: "error", message: "User not found." });
             }
+            const statusOfCaching = await this.checkingRedisCache(user_id);
+            console.log(`Redis cache status: ${statusOfCaching.status}`);
+            if (statusOfCaching.status === "already cached") {
+                return res.status(200).json({ status: "success", friends: JSON.parse(statusOfCaching.data) });
+            }
             const friends = await User.find({ _id: { $in: user.friends } });
             const sensFriends = friends?.map((friend:any) => {
                 const { password, ...rest } = friend.toObject();
+                console.log("rest", rest);
                 return rest;
             });
+            await this.cachingFriendsToRedis(sensFriends, user_id);
             res.status(200).json({ status: "success", message: "Friends list fetched successfully", friends: sensFriends });
         } catch (error) {
             next();
@@ -145,20 +159,49 @@ class FriendController implements Friend_Controller {
             res.status(500).json({ status: "error", message: error?.message || error });  
         }
     }
-async acceptFriendRequest(req:any, res:any, next:any): Promise<ModuleRes | any> {
-        try {
-            const { friendRequestId } = req.body;
-            const friendRequest = await FriendRequest.findById(friendRequestId);
-            if (!friendRequest) {
-                return res.status(404).json({ status: "error", message: "Friend request not found." });
-            }
-            friendRequest.status = "accepted";
-            await friendRequest.save();
-            return { status: "success", message: "Friend request accepted successfully" };
-        } catch (error) {
-            next();
-            console.log("error in friend controller", error);
+    async acceptFriendRequest(req:any, res:any, next:any): Promise<ModuleRes | any> {
+            try {
+                const { friendRequestId } = req.body;
+                const friendRequest = await FriendRequest.findById(friendRequestId);
+                if (!friendRequest) {
+                    return res.status(404).json({ status: "error", message: "Friend request not found." });
+                }
+                friendRequest.status = "accepted";
+                await friendRequest.save();
+                return { status: "success", message: "Friend request accepted successfully" };
+            } catch (error) {
+                next();
+                console.log("error in friend controller", error);
             res.status(500).json({ status: "error", message: error.message });  
+        }
+    }
+
+    async cachingFriendsToRedis(toCache:any, user_id:string): Promise<any> { 
+        try {
+            const cachedFriends = await redisClient.get(`${user_id}_friends`);
+            if (cachedFriends) {
+                return({status: "already cached", message: `Friends already cached, id: ${user_id}`});
+            }
+
+            await redisClient.setEx(`${user_id}_friends`, parseInt(process.env.REDIS_EXPIRE_TIME), JSON.stringify(toCache));
+            console.log("cached friends", toCache);
+            return toCache;
+        } catch (error) {
+            console.log("error in caching friends to redis", error);
+            throw error;
+        }
+    }
+
+    async checkingRedisCache(user_id:string): Promise<any> { 
+        try {
+            const cachedFriends = await redisClient.get(`${user_id}_friends`);
+            if (cachedFriends) {
+                return({status: "already cached", data: cachedFriends});
+            }
+            return({status: "not cached", data: null});
+        } catch (error) {
+            console.log("error in caching friends to redis", error);
+            throw error;
         }
     }
 }

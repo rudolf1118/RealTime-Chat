@@ -1,7 +1,7 @@
 import { Button, TextField, Typography } from "@mui/material";
 import { useState } from "react";
 import { Container } from "@mui/material";
-import { sendFriendRequest } from "./friendRequest";
+import { sendFriendRequest } from "./friendRequestAPI";
 import FriendRequestList from "./friendRequestList";
 
 const AddFriend = () => {
@@ -27,13 +27,16 @@ const AddFriend = () => {
                             setFriend("");
                         }
                     }}
+                    error={requestStatus && requestStatus.status === 'error'}
+                    helperText={requestStatus && requestStatus.status === 'error' ? requestStatus.message : ''}
                 />
                 {requestStatus && requestStatus.status && (
                     <Typography
                         sx={{
                             color: requestStatus.status === 'error' ? 'red' : 'green',
-                            fontWeight: 'bold',
-                            mt: 2
+                            fontSize: "12px",
+                            fontWeight: 'semibold',
+                            textAlign: 'left',
                         }}
                     >
                         {requestStatus.message}
