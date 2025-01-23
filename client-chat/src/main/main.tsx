@@ -20,7 +20,9 @@ const Main: React.FC = () => {
                 <Route path="/" element={<LandingPage />} />
                 <Route path="/login" element={<AlreadySignedIn><LoginPage handleCreds={handleCreds} /></AlreadySignedIn>} />
                 <Route path="/register" element={<AlreadySignedIn><RegistrationPage /></AlreadySignedIn>} />
-                <Route path="/main/*" element={<ProtectedRoute><Side user_id={userId} /></ProtectedRoute>} />
+                <Route element={<ProtectedRoute/>}>
+                    <Route path="/main/*" element={<Side user_id={userId} />} />
+                </Route>
             </Routes>
         </BrowserRouter>
     );

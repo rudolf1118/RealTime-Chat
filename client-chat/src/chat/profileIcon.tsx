@@ -73,12 +73,13 @@ function stringAvatar(name: string) {
 
 export default function BackgroundLetterAvatars(props: { username: string; online: boolean }) {
   return (
-    <Stack direction="row" spacing={2}>
+    <Stack direction="row" spacing={2} >
       <StyledBadge
         overlap="circular"
         anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
         variant="dot"
         online={props.online}
+        sx={{ transform: 'scale(1.2)' }}
       >
         <Avatar {...stringAvatar(`${props.username || '?'}`)} />
       </StyledBadge>

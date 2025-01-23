@@ -12,8 +12,10 @@ const AddFriend = () => {
         setRequestStatus(newFriend);
         console.log(newFriend);
     }
+    const [showFriendRequests, setShowFriendRequests] = useState(false);
     return (
         <Container sx={{ display: "flex", alignItems: "center", width: "100%"}}>
+            {showFriendRequests ? <FriendRequestList/> : null}
             <Container sx={{ display: "flex", flexDirection: "column", alignItems: "center", width: "100%"}}>
                 <TextField
                     label="Add Friend"
@@ -44,7 +46,7 @@ const AddFriend = () => {
                 )}
             </Container>
     
-            <Button onClick={() => <FriendRequestList/>} >
+            <Button onClick={() => setShowFriendRequests(true)} >
                 View Friend Requests
             </Button>
         </Container>
