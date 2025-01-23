@@ -17,15 +17,15 @@ const Side:React.FC<any> = (props: any) => {
 
     return (
         <>
-        <ProtectedRoute>
             <Box sx={{ display: 'flex', flexDirection: 'column', height: '100vh', margin: '0' }}>
                 <SideBar />
                 <Routes>
-                    <Route path="friends" element={<FriendList/>} />
-                    <Route path="chats" element={chatId ? <Chat /> : <ChatList />} />
+                    <Route element={<ProtectedRoute/>}>
+                        <Route path="friends" element={<FriendList/>} />
+                        <Route path="chats" element={chatId ? <Chat /> : <ChatList />} />
+                    </Route>
                 </Routes>
             </Box>
-        </ProtectedRoute>
         </>
     );
 };

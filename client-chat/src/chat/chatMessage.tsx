@@ -18,7 +18,6 @@ interface Message {
   }
 
 const ChatMessage: React.FC<{ messages: any, senderName: string }> = (props) => {
-  console.log(props.messages);
     return (
         <Paper
         elevation={3}

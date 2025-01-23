@@ -12,8 +12,15 @@ export const getFriendList = async (): Promise<any> => {
 }
 
 export const removeFriend = async (friend_id: any): Promise<any> => {
-    const request = await API.serverAPI_With_Auth.delete(`/friends/removeFriend`, { data: { friend_id } });
-    return request?.data?.friends || [];
+    try {
+        const request = await API.serverAPI_With_Auth.delete(`/friends/removeFriend`, { data: { friend_id } });
+        return request?.data?.friends || [];
+        console.log(request);
+    } catch (error) {
+        console.error('Error removing friend:', error);
+        const errorMessage = error?.response?.data?.message || 'An error occurred';
+        return { error: errorMessage }; // Return the error message
+    }
 }
 
 export const addFriend = async (friendName: string): Promise<any> => {

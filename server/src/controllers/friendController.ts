@@ -105,11 +105,14 @@ class FriendController implements Friend_Controller {
                 return res.status(400).json({ errors });
             }
             const user = await User.findById(user_id);
+            console.log(user);
             if (!user) {
                 return res.status(404).json({ status: "error", message: "User not found." });
             }
             user.friends = user.friends.filter((id) => id.toString() !== friend_id);
+            console.log(user.friends);
             await user.save();
+            await this.updateRedisCache(user_id);
             res.status(200).json({ status: "success", message: "Friend deleted successfully" });
         } catch (error) {
             next();
@@ -201,6 +204,21 @@ class FriendController implements Friend_Controller {
             return({status: "not cached", data: null});
         } catch (error) {
             console.log("error in caching friends to redis", error);
+            throw error;
+        }
+    }
+
+    async updateRedisCache(user_id:string): Promise<any> {
+        try {
+            const user = await User.findById(user_id);
+            const friends = await User.find({ _id: { $in: user.friends } });
+            await redisClient.del(`${user_id}_friends`).catch(err => {
+                console.error('Error deleting Redis cache:', err);
+                throw err;
+            });
+            await redisClient.setEx(`${user_id}_friends`, parseInt(process.env.REDIS_EXPIRE_TIME), JSON.stringify(friends));
+        } catch (error) {
+            console.log("error in updating redis cache", error);
             throw error;
         }
     }

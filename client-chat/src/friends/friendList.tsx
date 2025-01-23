@@ -26,28 +26,65 @@ const FriendList: React.FC<any> = ( ) => {
     }, []);
 
   return (
-    <Container sx={{ alignItems: "center", display: "flex", flexDirection: "column", height: "100vh" }} maxWidth='sm'>
+    <Box sx={{ alignItems: "center", display: "flex", flexDirection: "column", height: "100vh" }}>
       <Box>
       <AddFriend />
         <Table sx={{ width: "100%", mt: "10px" }}>
           <TableBody>
             {friendsList?.map((friend: any, index: number) => (
-              <TableRow key={friend?._id || "1"}>
-                <TableCell align="center" sx={{ display: { xs: 'block', md: 'table-cell', alignItems: 'center' } }}>{friend?.username}</TableCell>
-                <TableCell align="center" sx={{ display: { xs: 'block', md: 'table-cell' } }}>{friend?.email}</TableCell>
-                <TableCell align="center" sx={{ display: { xs: 'block', md: 'table-cell' } }}>
-                  <Button 
-                      sx={{ width: "100px", height: "30px", fontSize: "8px" }} 
-                      variant="contained" 
-                      color="error" 
-                      onClick={() => handleRemoveFriend(index)}>Remove Friend</Button>
+              <TableRow key={friend?._id || "1"} hover sx={{ display: { xs: 'block', md: 'table-row' } }}>
+                <TableCell 
+                  align="center" 
+                  sx={{ 
+                    display: { xs: 'flex', md: 'table-cell' },
+                    justifyContent: 'center',
+                    padding: { xs: '8px', md: '16px' },
+                    borderBottom: { xs: 'none', md: '1px solid rgba(224, 224, 224, 1)' }
+                  }}
+                >
+                  {friend?.username}
+                </TableCell>
+                <TableCell 
+                  align="center"
+                  sx={{
+                    display: { xs: 'flex', md: 'table-cell' },
+                    justifyContent: 'center', 
+                    padding: { xs: '8px', md: '16px' },
+                    borderBottom: { xs: 'none', md: '1px solid rgba(224, 224, 224, 1)' }
+                  }}
+                >
+                  {friend?.email}
+                </TableCell>
+                <TableCell 
+                  align="center"
+                  sx={{
+                    display: { xs: 'flex', md: 'table-cell' },
+                    justifyContent: 'center',
+                    padding: { xs: '8px', md: '16px' },
+                    borderBottom: { xs: '1px solid rgba(224, 224, 224, 1)', md: '1px solid rgba(224, 224, 224, 1)' },
+                    marginBottom: { xs: '8px', md: 0 }
+                  }}
+                >
+                  <Button
+                    sx={{ 
+                      minWidth: { xs: '80%', md: '120px' },
+                      fontSize: '0.75rem',
+                      padding: '6px 16px'
+                    }}
+                    variant="contained"
+                    color="error"
+                    size="small" 
+                    onClick={() => handleRemoveFriend(index)}
+                  >
+                    Remove Friend
+                  </Button>
                 </TableCell>
               </TableRow>
             ))}
           </TableBody>
         </Table>
       </Box>
-    </Container>
+    </Box>
   );
 };
 

@@ -8,6 +8,7 @@ const FriendRequestList = () => {
     useEffect(() => {
         const fetchFriendRequests = async () => {
             const requests:any[] = await getFriendRequests();
+            console.log(requests);
             setRequestsList(requests || []);
         }
         fetchFriendRequests();
