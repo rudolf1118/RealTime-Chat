@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 import { Box } from "@mui/material";
 import ChatList from "../../chat/chatList";
 import Chat from "../../chat/chatService";
+import FriendRequestList from "../../friends/friendRequestList";
 interface FriendListProps {
     friends: any[]; // Define the type of friends as needed
 }
@@ -21,7 +22,8 @@ const Side:React.FC<any> = (props: any) => {
                 <SideBar />
                 <Routes>
                     <Route element={<ProtectedRoute/>}>
-                        <Route path="friends" element={<FriendList/>} />
+                        <Route path="friends" element={<FriendList/>}/>
+                        <Route path="friends/requests" element={<FriendRequestList/>}/>
                         <Route path="chats" element={chatId ? <Chat /> : <ChatList />} />
                     </Route>
                 </Routes>

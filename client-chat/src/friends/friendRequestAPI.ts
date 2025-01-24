@@ -1,4 +1,5 @@
 import { socket } from '../socket/connection';
+import ServerAPI from '../config/APi';
 
 export const acceptFriendRequest = async (userId: string, username: string) => {
     socket.emit('acceptFriendRequest', { userId, username });
@@ -42,10 +43,22 @@ export const receiveFriendRequest = async (userInfo: string): Promise<any> => {
     });
 }
 
-export const getFriendRequests = async () => {
-    socket.on('friendRequests', (requests) => {
-        return requests;
+// export const getFriendRequests = async () => {
+//     socket.on('friendRequests', (requests) => {
+//         return requests;
 
-    });
-    return [];
+//     });
+//     return [];
+// }
+
+export const getFriendRequests = async () => {
+    try {
+        const request = await ServerAPI.serverAPI_With_Auth.get(`/friends/getFriendRequests`);
+        console.log("request", request);
+        return request?.data?.friendRequests || [];
+    } catch (error) {
+        console.error('Error fetching friend requests:', error);
+        const errorMessage = error?.response?.data?.message || 'An error occurred';
+        return { error: errorMessage };
+    }
 }
