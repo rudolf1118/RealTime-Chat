@@ -28,4 +28,8 @@ router.post('/acceptFriendRequest', (req, res, next) => {
   friendController.acceptFriendRequest(req, res, next).catch(next);
 });
 
+router.get('/getFriendRequests', (req, res, next) => {
+  friendController.getFriendRequests(req, res, next).catch(next);
+});
+
 export default router;

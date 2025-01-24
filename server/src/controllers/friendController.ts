@@ -77,7 +77,7 @@ class FriendController implements Friend_Controller {
             if (!user) {
                 return res.status(404).json({ status: "error", message: "User not found." });
             }
-            const statusOfCaching = await this.checkingRedisCache(user_id);
+            const statusOfCaching = await this.checkingRedisCache(user_id, 'friends');
             console.log(`Redis cache status: ${statusOfCaching.status}`);
             if (statusOfCaching.status === "already cached") {
                 return res.status(200).json({ status: "success", friends: JSON.parse(statusOfCaching.data) });
@@ -88,7 +88,7 @@ class FriendController implements Friend_Controller {
                 console.log("rest", rest);
                 return rest;
             });
-            await this.cachingFriendsToRedis(sensFriends, user_id);
+            await this.cachingToRedis(sensFriends, user_id, 'friends');
             res.status(200).json({ status: "success", message: "Friends list fetched successfully", friends: sensFriends });
         } catch (error) {
             next();
@@ -112,7 +112,7 @@ class FriendController implements Friend_Controller {
             user.friends = user.friends.filter((id) => id.toString() !== friend_id);
             console.log(user.friends);
             await user.save();
-            await this.updateRedisCache(user_id);
+            await this.updateRedisCache(user_id, 'friends');
             res.status(200).json({ status: "success", message: "Friend deleted successfully" });
         } catch (error) {
             next();
@@ -122,7 +122,6 @@ class FriendController implements Friend_Controller {
     }
     async sendFriendRequest (userInfo:any, res:any, next:any): Promise<ModuleRes> {
         try {
-            console.log(userInfo.userInfo)
             const user_id = await AuthController.getUserIdFromToken({userInfo, isSocket: true});
             const user = await User.findById(user_id);
             const receiver = await User.findOne({ $or: [{ username: userInfo.userInfo }, { email: userInfo.userInfo }] });
@@ -155,6 +154,24 @@ class FriendController implements Friend_Controller {
         try {
             const user_id = await AuthController.getUserIdFromToken(req);
             const friendRequests = await FriendRequest.find({ receiverId: user_id });
+            const requests = [];
+
+            for (const request of friendRequests) {
+                let candidate = await User.findById(request.senderId);
+                if (!candidate) {
+                    continue;
+                }
+                const { password, ...rest } = candidate.toObject();
+                requests.push({...rest, timestamp: request.createdAt});
+            }
+            if (!friendRequests) {
+                return res.status(404).json({ status: "error", message: "Friend requests not found." });
+            }
+            const checkStatus = await this.checkingRedisCache(user_id, 'friendRequests');
+            if (checkStatus.status === "already cached") {
+                return res.status(200).json({ status: "success", message: "Friend requests fetched successfully", friendRequests: JSON.parse(checkStatus.data) });
+            }
+            await this.cachingToRedis(requests, user_id, 'friendRequests');
             res.status(200).json({ status: "success", message: "Friend requests fetched successfully", friendRequests: friendRequests });
         } catch (error) {
             next();
@@ -179,46 +196,46 @@ class FriendController implements Friend_Controller {
         }
     }
 
-    async cachingFriendsToRedis(toCache:any, user_id:string): Promise<any> { 
+    async cachingToRedis(toCache:any, user_id:string, type:'friends'|'friendRequests'): Promise<any> { 
         try {
-            const cachedFriends = await redisClient.get(`${user_id}_friends`);
-            if (cachedFriends) {
-                return({status: "already cached", message: `Friends already cached, id: ${user_id}`});
+            const cachedData = await redisClient.get(`${user_id}_${type}`);
+            if (cachedData) {
+                return({status: "already cached", message: `${type} already cached, id: ${user_id}`});
             }
 
-            await redisClient.setEx(`${user_id}_friends`, parseInt(process.env.REDIS_EXPIRE_TIME), JSON.stringify(toCache));
-            console.log("cached friends", toCache);
+            await redisClient.setEx(`${user_id}_${type}`, parseInt(process.env.REDIS_EXPIRE_TIME), JSON.stringify(toCache));
+            console.log(`cached ${type}`, toCache);
             return toCache;
         } catch (error) {
-            console.log("error in caching friends to redis", error);
+            console.log(`error in caching ${type} to redis`, error);
             throw error;
         }
     }
 
-    async checkingRedisCache(user_id:string): Promise<any> { 
+    async checkingRedisCache(user_id:string, type:'friends'|'friendRequests'): Promise<any> { 
         try {
-            const cachedFriends = await redisClient.get(`${user_id}_friends`);
-            if (cachedFriends) {
-                return({status: "already cached", data: cachedFriends});
+            const cachedData = await redisClient.get(`${user_id}_${type}`);
+            if (cachedData) {
+                return({status: "already cached", data: cachedData});
             }
             return({status: "not cached", data: null});
         } catch (error) {
-            console.log("error in caching friends to redis", error);
+            console.log(`error in checking ${type} cache`, error);
             throw error;
         }
     }
 
-    async updateRedisCache(user_id:string): Promise<any> {
+    async updateRedisCache(user_id:string, type:'friends'|'friendRequests'): Promise<any> {
         try {
             const user = await User.findById(user_id);
             const friends = await User.find({ _id: { $in: user.friends } });
-            await redisClient.del(`${user_id}_friends`).catch(err => {
+            await redisClient.del(`${user_id}_${type}`).catch(err => {
                 console.error('Error deleting Redis cache:', err);
                 throw err;
             });
-            await redisClient.setEx(`${user_id}_friends`, parseInt(process.env.REDIS_EXPIRE_TIME), JSON.stringify(friends));
+            await redisClient.setEx(`${user_id}_${type}`, parseInt(process.env.REDIS_EXPIRE_TIME), JSON.stringify(friends));
         } catch (error) {
-            console.log("error in updating redis cache", error);
+            console.log(`error in updating ${type} redis cache`, error);
             throw error;
         }
     }
