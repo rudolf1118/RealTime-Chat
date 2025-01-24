@@ -3,19 +3,24 @@ import { useState } from "react";
 import { Container } from "@mui/material";
 import { sendFriendRequest } from "./friendRequestAPI";
 import FriendRequestList from "./friendRequestList";
-
+import { useNavigate } from "react-router-dom";
 const AddFriend = () => {
     const [friend, setFriend] = useState("");
+    const navigate = useNavigate();
     const [requestStatus, setRequestStatus] = useState<any | null>(null);
     const addingNewFriend = async (friend: string) => {
+        console.log(friend);
         const newFriend:any = await sendFriendRequest(friend);
         setRequestStatus(newFriend);
         console.log(newFriend);
     }
-    const [showFriendRequests, setShowFriendRequests] = useState(false);
+    
+    const showRequestList = () => {
+        navigate('requests');
+    }
+
     return (
         <Container sx={{ display: "flex", alignItems: "center", width: "100%"}}>
-            {showFriendRequests ? <FriendRequestList/> : null}
             <Container sx={{ display: "flex", flexDirection: "column", alignItems: "center", width: "100%"}}>
                 <TextField
                     label="Add Friend"
@@ -46,7 +51,7 @@ const AddFriend = () => {
                 )}
             </Container>
     
-            <Button onClick={() => setShowFriendRequests(true)} >
+            <Button onClick={(showRequestList)} >
                 View Friend Requests
             </Button>
         </Container>

@@ -1,4 +1,4 @@
-import express from 'express';
+import express, { NextFunction, Request, Response } from 'express';
 import http from 'http';
 import mongoose from 'mongoose';
 import cors from 'cors';
@@ -21,13 +21,22 @@ export const server = http.createServer(app);
 const redisClient = createClient({
     url: process.env.REDIS_URL,
 });
-app.use(cors());
+
+// Configure CORS with specific options
+app.use(cors({
+    origin: process.env.CLIENT_URL || 'http://localhost:3000', // Allow your client origin
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // Allowed HTTP methods
+    allowedHeaders: ['Content-Type', 'Authorization'], // Allowed headers
+    credentials: true // Allow credentials
+}));
+
 app.use(express.json());
 app.use("/api/auth", userRouter);
 app.use("/api/friends", friendRouter);
 app.use("/api/protected", protectedRoute);
 app.use("/api/messages", messageRouter);
 app.use(morgan("dev")); // Log all requests to the console
+
 const start = async () => {
     try {
         await mongoose.connect(process.env.MONGODB_SRV as string);
