@@ -15,5 +15,5 @@ const io = new socket_io_1.Server(server, {
 app.use((0, cors_1.default)());
 app.use(express_1.default.json());
 server.listen(3000, () => {
-    console.log('Server is running on port 3000');
+    logger.log('Server is running on port 3000');
 });

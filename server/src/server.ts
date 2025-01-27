@@ -2,16 +2,14 @@ import express, { NextFunction, Request, Response } from 'express';
 import http from 'http';
 import mongoose from 'mongoose';
 import cors from 'cors';
-import authRouter from './routes/messageRoutes';
+import { logger } from './utils/logger';
 import userRouter from './routes/userRoutes';
 import dotenv from 'dotenv';
-import { socketConnection }from './WebSocket/socketConnection';
-import { Server } from 'socket.io';
+import { webSocket }from './WebSocket/socketConnection';
 import protectedRoute from './routes/protectedRoute';
 import friendRouter from './routes/friendRoutes';
 import morgan from 'morgan';
 import messageRouter from './routes/messageRoutes';
-import redis from 'redis';
 import { createClient } from 'redis';
 
 
@@ -40,16 +38,16 @@ app.use(morgan("dev")); // Log all requests to the console
 const start = async () => {
     try {
         await mongoose.connect(process.env.MONGODB_SRV as string);
-        console.log(`Connected to MongoDB`);
-        redisClient.on('error', (err) => console.log('Redis Client Error', err));
+        webSocket.init(server);
+        logger.log('Connected to MongoDB');
+        redisClient.on('error', (err) => logger.error('Redis Client Error', err));
         await redisClient.connect();
         server.listen(process.env.PORT, () => {
-            console.log(`Server is running on port ${process.env.PORT}`);
+            logger.log(`Server is running on port ${process.env.PORT}`);
         });
     } catch (error) {
-        console.error(error);
+       logger.error(error);
     }
 };
 export { redisClient };
 start();
-socketConnection(); 

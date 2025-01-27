@@ -4,7 +4,7 @@ import { Server } from 'socket.io';
 import Message from '../models/messageModel';
 import { Message_Controller } from '../types/Controllers';
 import { redisClient } from "../server";
-
+import { logger } from '../utils/logger';
 
 class MessageController implements Message_Controller {
     private io: Server | null = null;
@@ -24,7 +24,7 @@ class MessageController implements Message_Controller {
         try {
             const { senderId, receiverId } = req.query;
             const statusOfCaching = await this.checkingRedisCache(senderId, receiverId);
-            console.log(`Redis cache status: ${statusOfCaching.status}`);
+            logger.log(`Redis cache status: ${statusOfCaching.status}`);
             if (statusOfCaching.status === "already cached") {
                 return res.json({messages: JSON.parse(statusOfCaching.data)});
             }
@@ -37,7 +37,7 @@ class MessageController implements Message_Controller {
             await this.cachingMessagesToRedis(messages, senderId, receiverId);
             res.json(messages);
         } catch (error) {
-            console.error(error);
+            logger.error(error);
             res.status(500).json({ message: 'Error fetching messages' });
         }
     }
@@ -52,13 +52,13 @@ class MessageController implements Message_Controller {
                 timestamp 
             });
             await message.save();
-            console.log("Message saved");
+            logger.log("Message saved");
             if (this.io) {
                 this.io.to(receiverId).emit('receiveMessage', message);
             }
             return message;
         } catch (error) {
-            console.error(error);
+            logger.error(error);
             return { message: 'Error posting message' };
         }
     }
@@ -74,7 +74,7 @@ class MessageController implements Message_Controller {
             }
             return({status: "not cached", data: null});
         } catch (error) {
-            console.log("error in caching friends to redis", error);
+            logger.log("error in caching friends to redis", error);
             throw error;
         }
     }
@@ -87,10 +87,10 @@ class MessageController implements Message_Controller {
             }
 
             await redisClient.setEx(`${senderId}_${receiverId}_messages`, parseInt(process.env.REDIS_EXPIRE_TIME), JSON.stringify(toCache));
-            console.log("cached messages", toCache);
+            logger.log("cached messages", toCache);
             return toCache;
         } catch (error) {
-            console.log("error in caching friends to redis", error);
+            logger.log("error in caching friends to redis", error);
             throw error;
         }
     }

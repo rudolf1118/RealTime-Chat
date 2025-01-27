@@ -9,7 +9,7 @@ export const registerUser = async (user: {username: string, email: string, passw
         });
         return request;
     } catch (error) {
-        console.error('Error registering user:', error);
+        console.log('Error registering user:', error);
         if (error.response?.data?.message.includes("duplicate key error")) {
             return { error: "duplicate" };
         }

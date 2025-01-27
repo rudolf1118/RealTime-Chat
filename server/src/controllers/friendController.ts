@@ -5,11 +5,13 @@ import { ModuleRes } from "../types/UtilTypes";
 import { validationResult } from 'express-validator';
 import jwt from "jsonwebtoken";
 import AuthController from "./authController";
-import { isValidEmail, removePasswordFromUser } from "../Utils/helperFunctions";
+import { isValidEmail, removePasswordFromUser } from "../utils/helperFunctions";
 import FriendRequest from "../models/friendRequestModel";
 import { Server } from 'socket.io';
 import { redisClient } from "../server";
 import { promisify } from 'util';
+import { acceptFriendRequestTransaction } from "../transactions/friend_request_transaction";
+import { logger } from "../utils/logger";
 
 class FriendController implements Friend_Controller {
     private io: Server | null = null;
@@ -43,14 +45,14 @@ class FriendController implements Friend_Controller {
             res.status(200).json({ status: "success", message: "Friend added successfully", friend: friend });
         } catch (error) {
             next();
-            console.log("error in auth controller", error);
+            logger.error("error in auth controller", error);
             res.status(500).json({ status: "error", message: error.message });  
         }
     }
     async getFriendById(req: any, res: any, next: any): Promise<ModuleRes> {
         try {
             const { friend_id } = req.query;
-            console.log("friend_id", friend_id);
+            logger.log("friend_id", friend_id);
             const friend = await User.findById(friend_id);
             if (!friend) {
                 return res.status(404).json({ status: "error", message: "Friend not found." });
@@ -59,7 +61,7 @@ class FriendController implements Friend_Controller {
             return res.status(200).json({ status: "success", message: "Friend fetched successfully", friend: rest });
         } catch (error) {
             next();
-            console.log("error in friend controller", error);
+            logger.error("error in friend controller", error);
             res.status(500).json({ status: "error", message: error.message });  
         }
     }
@@ -78,21 +80,21 @@ class FriendController implements Friend_Controller {
                 return res.status(404).json({ status: "error", message: "User not found." });
             }
             const statusOfCaching = await this.checkingRedisCache(user_id, 'friends');
-            console.log(`Redis cache status: ${statusOfCaching.status}`);
+            logger.log(`Redis cache status: ${statusOfCaching.status}`);
             if (statusOfCaching.status === "already cached") {
                 return res.status(200).json({ status: "success", friends: JSON.parse(statusOfCaching.data) });
             }
             const friends = await User.find({ _id: { $in: user.friends } });
             const sensFriends = friends?.map((friend:any) => {
                 const { password, ...rest } = friend.toObject();
-                console.log("rest", rest);
+                logger.log("rest", rest);
                 return rest;
             });
             await this.cachingToRedis(sensFriends, user_id, 'friends');
             res.status(200).json({ status: "success", message: "Friends list fetched successfully", friends: sensFriends });
         } catch (error) {
             next();
-            console.log("error in friend controller", error);
+            logger.error("error in friend controller", error);
             res.status(500).json({ status: "error", message: error.message });  
         }
     }
@@ -105,18 +107,17 @@ class FriendController implements Friend_Controller {
                 return res.status(400).json({ errors });
             }
             const user = await User.findById(user_id);
-            console.log(user);
             if (!user) {
                 return res.status(404).json({ status: "error", message: "User not found." });
             }
             user.friends = user.friends.filter((id) => id.toString() !== friend_id);
-            console.log(user.friends);
+            logger.log("User's friends", user.friends);
             await user.save();
             await this.updateRedisCache(user_id, 'friends');
             res.status(200).json({ status: "success", message: "Friend deleted successfully" });
         } catch (error) {
             next();
-            console.log("error in friend controller", error);
+            logger.error("error in friend controller", error);
             res.status(500).json({ status: "error", message: error.message });  
         }
     }
@@ -142,11 +143,11 @@ class FriendController implements Friend_Controller {
             receiver.friendRequests.push({senderId:user_id, status:"pending"});
             await friendRequest.save();
             await receiver.save();
-            console.log("friendRequest", friendRequest);
-            console.log("Friend request sent successfully");
+            logger.log("friend requests", friendRequest);
+            logger.log("Friend request sent successfully");
             return ({ status: "success", message: "Friend request sent successfully" });
         } catch (error) {
-            console.log("error in friend controller", error);
+            logger.error("error in friend controller", error);
             return({ status: "error", message: error?.message || error });  
         }
     }
@@ -175,7 +176,7 @@ class FriendController implements Friend_Controller {
             res.status(200).json({ status: "success", message: "Friend requests fetched successfully", friendRequests: friendRequests });
         } catch (error) {
             next();
-            console.log("error in friend controller", error);
+            logger.log("error in friend controller", error);
             res.status(500).json({ status: "error", message: error?.message || error });  
         }
     }
@@ -191,7 +192,22 @@ class FriendController implements Friend_Controller {
                 return { status: "success", message: "Friend request accepted successfully" };
             } catch (error) {
                 next();
-                console.log("error in friend controller", error);
+                logger.error("error in friend controller", error);
+                res.status(500).json({ status: "error", message: error.message });  
+        }
+    }
+
+    async rejectFriendRequest(req:any, res:any, next:any): Promise<ModuleRes | any> {
+        try {
+            const { friendRequestId } = req.body;
+            // const friendRequest = await acceptFriendRequestTransaction(friendRequestId);
+            // if (!friendRequest) {
+            //     return res.status(404).json({ status: "error", message: "Friend request not found." });
+            // }
+            return { status: "success", message: "Friend request rejected successfully" };
+        } catch (error) {
+            next();
+            logger.error("error in friend controller", error);
             res.status(500).json({ status: "error", message: error.message });  
         }
     }
@@ -204,10 +220,10 @@ class FriendController implements Friend_Controller {
             }
 
             await redisClient.setEx(`${user_id}_${type}`, parseInt(process.env.REDIS_EXPIRE_TIME), JSON.stringify(toCache));
-            console.log(`cached ${type}`, toCache);
+            logger.log(`cached ${type}`, toCache);
             return toCache;
         } catch (error) {
-            console.log(`error in caching ${type} to redis`, error);
+            logger.error(`error in caching ${type} to redis`, error);
             throw error;
         }
     }
@@ -220,7 +236,7 @@ class FriendController implements Friend_Controller {
             }
             return({status: "not cached", data: null});
         } catch (error) {
-            console.log(`error in checking ${type} cache`, error);
+            logger.error(`error in checking ${type} cache`, error);
             throw error;
         }
     }
@@ -230,12 +246,12 @@ class FriendController implements Friend_Controller {
             const user = await User.findById(user_id);
             const friends = await User.find({ _id: { $in: user.friends } });
             await redisClient.del(`${user_id}_${type}`).catch(err => {
-                console.error('Error deleting Redis cache:', err);
+                logger.error('Error deleting Redis cache:', err);
                 throw err;
             });
             await redisClient.setEx(`${user_id}_${type}`, parseInt(process.env.REDIS_EXPIRE_TIME), JSON.stringify(friends));
         } catch (error) {
-            console.log(`error in updating ${type} redis cache`, error);
+            logger.error(`error in updating ${type} redis cache`, error);
             throw error;
         }
     }
