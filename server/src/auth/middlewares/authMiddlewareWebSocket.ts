@@ -1,5 +1,6 @@
 import jwt from 'jsonwebtoken';
 import config from '../tokenGeneration/config';
+import { logger } from '../../utils/logger';
 
 function verifySocketToken(socket:any, next:any) {
     try {
@@ -14,7 +15,7 @@ function verifySocketToken(socket:any, next:any) {
             next();
         });
     } catch (error) {
-        console.log("invalid token", error);
+        logger.error("invalid token", error);
         next(error);
     }
 }

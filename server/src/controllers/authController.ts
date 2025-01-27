@@ -6,11 +6,18 @@ import { validationResult } from 'express-validator';
 import config from "../auth/tokenGeneration/config";
 import tokenGenerator from "../auth/tokenGeneration/generator";
 import jwt from "jsonwebtoken";
-import { removePasswordFromUser } from "../Utils/helperFunctions";
+import { removePasswordFromUser } from "../utils/helperFunctions";
+import { logger } from "../utils/logger";
+
 class AuthController implements Auth_Controller {
     async register(req: any, res: any, next: any): Promise<ModuleRes> {
         try {
             const { username, email, password } = req.body;
+            const check = await User.findOne({ $or: [{ email }, { username }] });
+            if (check) {
+                logger.log("Email or username already exists", `User Name: ${username} Email: ${email}`);
+                return res.status(400).json({ status: "error", message: "Email or username already exists" });
+            }
             const errors = validationResult(req);
             if (!errors.isEmpty()) {
                 return res.status(400).json({ errors });
@@ -18,11 +25,11 @@ class AuthController implements Auth_Controller {
             const hashedPassword = await bcrypt.hash(password, 10);
             const user = new User({ username, email, password: hashedPassword });
             await user.save();
-            console.log("user saved", user);
+            logger.log("user saved", user);
             res.status(201).json({ status: "success", message: "Registration successful" });
         } catch (error) {
             next();
-            console.log("error in auth controller", error);
+            logger.log("error in auth controller", error);
             res.status(500).json({ status: "error", message: error.message });  
         }
     }
@@ -41,7 +48,7 @@ class AuthController implements Auth_Controller {
             return res.status(200).json({ status: "success", message: "Login successful.", token, user_id: user._id });
         } catch (error) {
             next(error);
-            console.log("error in auth controller", error);
+            logger.log("error in auth controller", error);
             res.status(500).json({ status: "error", message: error.message });
         }
     }
