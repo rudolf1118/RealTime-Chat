@@ -21,4 +21,8 @@ router.get('/token', authMiddleware, (req, res, next) => {
 router.get('/getUser', authMiddleware, (req, res, next) => {
   authController.getUser(req, res, next).catch(next);
 });
+
+router.get('/getUserStatus', authMiddleware, (req, res, next) => {
+  authController.getUserStatus(req, res, next).catch(next);
+});
 export default router;

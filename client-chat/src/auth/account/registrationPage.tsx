@@ -16,9 +16,10 @@ const RegistrationPage = () => {
     const [passwordConfirm, setPasswordConfirm] = useState('');
     const [passwordConfirmErrorText, setPasswordConfirmErrorText] = useState('');
     const [username, setUsername] = useState('');
-    const [duplicateError, setDuplicateError] = useState(false);
-    const [duplicateErrorText, setDuplicateErrorText] = useState('');
+    const [duplicateError, setDuplicateError] = useState<any>(false);
+    const [duplicateErrorText, setDuplicateErrorText] = useState<any>({});
     const [response, setResponse] = useState(null);
+    const [usernameErrorText, setUsernameErrorText] = useState('');
     const successIDs = [200, 201, 202];
     const navigate = useNavigate(); 
 
@@ -58,12 +59,12 @@ const RegistrationPage = () => {
         }
         try {
             const response = await registerUser({username: user.username, email: user.email, password: user.password});
-            if (response?.error === 'duplicate') {
-                setDuplicateError(true);
-                setDuplicateErrorText('Username or email already exists');
+            if (response?.error) {
+                setDuplicateError(response.error);
+                setDuplicateErrorText(response.error);
             } else {
                 setDuplicateError(false);
-                setDuplicateErrorText('');
+                setDuplicateErrorText({});
             }
             if (response?.status && successIDs.some(id => id === response?.status)) {
                 navigate('/login');
@@ -76,8 +77,8 @@ const RegistrationPage = () => {
     const handlePasswordConfirmChange = e => {
         setPasswordConfirm(e?.target?.value);
         if (e?.target?.value?.length === 0 && password?.length === 0) {
-            setPasswordConfirmError(false);
-            setPasswordConfirmErrorText('');
+            setPasswordConfirmError(true);
+            setPasswordConfirmErrorText('Please enter your password');
         } 
         else if (password && e?.target?.value !== password) {
             setPasswordConfirmError(true);
@@ -85,6 +86,17 @@ const RegistrationPage = () => {
         } else {
             setPasswordConfirmError(false);
             setPasswordConfirmErrorText('');
+        }
+    }
+    const handleUsernameChange = e => {
+        setUsername(e?.target?.value);
+        if (e?.target?.value?.length === 0) {
+            setUsernameError(true);
+            setUsernameErrorText('Please enter your username');
+        } 
+        else {
+            setUsernameError(false);
+            setUsernameErrorText('');
         }
     }
     const handleShowPassword = () => {
@@ -102,8 +114,8 @@ const RegistrationPage = () => {
         const errors = [];
 
         if (newPassword?.length === 0 && password?.length === 0) {
-            setPasswordError(false);
-            setPasswordErrorText('');
+            setPasswordError(true);
+            setPasswordErrorText('Please enter your password');
         } 
         else {
             if (passwordConfirm && newPassword !== passwordConfirm) {
@@ -149,16 +161,21 @@ const RegistrationPage = () => {
                     label="Email (Required)"
                     value={mail}
                     onChange={handleMailChange}
-                    error={mailError || duplicateError}
+                    error={mailError || duplicateError?.email_error}
                     helperText={
-                      mailError ? "Please enter your email" : duplicateError ? duplicateErrorText : ""
+                      mailError ? "Please enter your email" : duplicateError?.email_error ? duplicateErrorText?.email_error : ""
                     }
                     sx={{ mt:2}} />
                     <TextField 
                     placeholder="Enter your username" 
                     name="username" 
                     type="text" 
-                    fullWidth autoFocus required 
+                    error={duplicateError?.username_error}
+                    helperText={duplicateError?.username_error ? duplicateErrorText?.username_error : ""}
+                    fullWidth 
+                    autoFocus 
+                    label="Username (Required)"
+                    required 
                     sx={{mb: 4, mt:2}} />
                     <TextField 
                     placeholder="Enter your password" 
@@ -166,13 +183,16 @@ const RegistrationPage = () => {
                     type={showPassword ? "text" : "password"}
                     error={passwordError}
                     helperText={passwordErrorText}
+                    label="Password (Required)"
                     onChange={handlePasswordChange}
-                    fullWidth required
+                    fullWidth 
+                    required
                     sx={{mb: 2}} />
                     <TextField 
                     placeholder="Enter your password again" 
                     name="password" 
                     type={showPassword ? "text" : "password"} 
+                    label="Password Confirmation (Required)"
                     onChange={handlePasswordConfirmChange}
                     helperText={passwordConfirmErrorText}
                     error={passwordConfirmError}

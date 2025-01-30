@@ -10,13 +10,16 @@ import { io, Socket } from 'socket.io-client';
 import { getFriendById } from '../friends/friendsAPI';
 import { getUser } from '../auth/authAPI';
 import { socket } from '../socket/connection';
-interface Message {
-    _id ?: string;
-    senderId: string;
-    receiverId: string;
-    text: string;
-    timestamp?: string;
-  }
+
+//* TODO: fix this
+// interface Message {
+//     _id ?: string;
+//     senderId: string;
+//     receiverId: string;
+//     text: string;
+//     timestamp?: string;
+// }
+type Message = any;
 
 const getUserIdFromURL = () => {
     const searchParams = new URLSearchParams(window.location.search);
@@ -60,9 +63,19 @@ const Chat: React.FC<{ username?: string, online?:boolean, messages?:Message[] }
 
     const sendMessage = (text: string) => {
         const newMessage: Message = {
-            senderId: senderId,
-            receiverId: receiverId,
-            text,
+            user_1: {
+                id: senderId,
+            },
+            user_2: {
+                id: receiverId,
+            },
+            messages: {
+                text: {
+                    senderId,
+                    receiverId,
+                    text,
+                }
+            },
             timestamp: Date.now().toString(),
         };
         socket.emit('sendMessage', newMessage);

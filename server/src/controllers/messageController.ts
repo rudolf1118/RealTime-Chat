@@ -44,8 +44,10 @@ class MessageController implements Message_Controller {
     
     async createMessage(messageData: any, socket: any): Promise<any> {
         try {
+            logger.log("",messageData)
             const { senderId, receiverId, text, timestamp } = messageData;
-            const message = new Message({ 
+            // * TODO: Add new schema for this...
+            const message = new Message({
                 sender: { id: senderId, username: senderId }, 
                 receiver: { id: receiverId, username: receiverId }, 
                 text, 

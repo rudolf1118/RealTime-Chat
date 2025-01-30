@@ -39,7 +39,7 @@ class WebSocketServer {
                 const token = socket.handshake.auth.token;
                 const user_id = getUserIdFromToken(token);
 
-                redisClient.set(`online:${user_id}`, JSON.stringify({
+                redisClient.set(`${user_id}`, JSON.stringify({
                     status: 'online',
                     user_id: user_id,
                     socketId: socket.id
@@ -72,7 +72,8 @@ class WebSocketServer {
 
                 socket.on('disconnect', () => {
                     logger.log('User disconnected:', socket.id);
-                    redisClient.del(`online:${user_id}`);
+                    socket.emit('userDisconnected', { user_id });
+                    redisClient.del(`${user_id}`);
                     clearInterval(intervalId);
                 });
             });

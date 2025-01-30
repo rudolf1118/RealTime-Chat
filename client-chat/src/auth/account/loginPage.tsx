@@ -7,7 +7,7 @@ import { useNavigate } from 'react-router-dom';
 import API from "../../config/APi";
 
 const LoginPage = (props: { handleCreds: (user: any) => void }) => {
-    const [email, setEmail] = useState('');
+    const [creds, setCreds] = useState('');
     const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
     const [error, setError] = useState('');
@@ -16,7 +16,7 @@ const LoginPage = (props: { handleCreds: (user: any) => void }) => {
     const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         const data = new FormData(event.currentTarget);
-        const email = data.get('email') as string;
+        const creds = data.get('creds') as string;
         const password = data.get('password') as string;
     }
     const handleShowPassword = () => {
@@ -26,9 +26,10 @@ const LoginPage = (props: { handleCreds: (user: any) => void }) => {
     const handleLogin = async () => {
         setError("");
         try {
-            const response = await loginUser(email, password); 
+            console.log(creds, password);
+            const response = await loginUser(creds, password); 
             if (response?.error?.includes("not found")) {
-                setError("Password or email is incorrect.");
+                setError("Username or Email is incorrect.");
                 return;
             }
             else if (response.error) {
@@ -62,7 +63,7 @@ const LoginPage = (props: { handleCreds: (user: any) => void }) => {
                 onSubmit={handleSubmit}
                 noValidate
                 sx={{ mt: 1 }}>
-                    <TextField placeholder="Enter your email" name="email" type="email" fullWidth autoFocus required sx={{mb: 2, mt:2}} onChange={(e) => setEmail(e.target.value)} />
+                    <TextField placeholder="Enter your username or email" name="creds" type="creds" fullWidth autoFocus required sx={{mb: 2, mt:2}} onChange={(e) => setCreds(e.target.value)} />
                     <TextField placeholder="Enter your password" name="password" type={showPassword ? "text" : "password"} fullWidth required sx={{mb: 2}} onChange={(e) => setPassword(e.target.value)} />
                     {error && <Typography color="error" sx={{fontSize: '14px', mb:2, textAlign: 'left' }}>{error}</Typography>}
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
