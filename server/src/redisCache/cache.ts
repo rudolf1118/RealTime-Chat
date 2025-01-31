@@ -1,16 +1,36 @@
 import { redisClient } from "../server";
 import { logger } from "../utils/logger";
 import User from "../models/userModel";
+import {CachingEnum, ICache } from "../types/UtilTypes";
 
 class Cache {
-    async createCache (data:any) {
-        if (!data || !(Object.keys(data).length > 0)) {
-            logger.error("Couldn't cache user in Redis");
-            return ;
+    async setCache (candidate:any, value: any, type: CachingEnum): Promise<ICache> {
+        if (!candidate || Object.keys(candidate).length <= 0) {
+            logger.error("Something went wrong in caching, candidate object is empty...");
+            throw new Error;
         }
-        const user = redisClient.hSet(`user:${data?._id}`, {
-            id: data?._id
+        if (await redisClient.get(`user:${candidate?.user_id}`)) {
+            logger.info(`user:${candidate?.user_id}, already cached`);
+            return {
+                done: false,
+                status: "Already cached",
+                message: `${type} already cached, id: ${candidate?.user_id}`
+            }
+        }
+        await redisClient.hSet(`user:${candidate?.user_id}`, {
+            ...value
+        }).catch((error)=>{
+            logger.error("Something went wrong in caching...");
+            throw new Error(error);
         });
+
+        logger.info(`user:${candidate?.user_id}, already cached`);
+
+        return {
+            done: true,
+            status: "Successfully cached",
+            message: `${type} successfully cached, id: ${candidate?.user_id}`
+        }
     }
 
     async updateCache (candidate:any, key:string, value: any, type: "user" | "message" | "friends"): Promise<any> {
@@ -34,21 +54,4 @@ class Cache {
     }
 }
 
-/*
-*
-*     async cachingMessagesToRedis(toCache:any, senderId:string, receiverId:string): Promise<any> {
-        try {
-            const cachedMessages = await redisClient.get(`${senderId}_${receiverId}_messages`);
-            if (cachedMessages) {
-                return({status: "already cached", message: `Messages already cached, id: ${senderId}_${receiverId}`});
-            }
-
-            await redisClient.setEx(`${senderId}_${receiverId}_messages`, parseInt(process.env.REDIS_EXPIRE_TIME), JSON.stringify(toCache));
-            logger.log("cached messages", toCache);
-            return toCache;
-        } catch (error) {
-            logger.log("error in caching friends to redis", error);
-            throw error;
-        }
-    }
-* */
+export default new Cache();
