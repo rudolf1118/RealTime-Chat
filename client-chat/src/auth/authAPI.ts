@@ -10,18 +10,15 @@ export const registerUser = async (user: {username: string, email: string, passw
         return request;
     } catch (error) {
         console.log('Error registering user:', error);
-        if (error.response?.data?.message.includes("duplicate key error")) {
-            return { error: "duplicate" };
-        }
         const errorMessage = error.response?.data?.message || 'An error occurred';
         return { error: errorMessage }; // Return the error message
     }
 }
 
-export const loginUser = async (email: string, password: string): Promise<any> => {
+export const loginUser = async (creds: string, password: string): Promise<any> => {
     try {
         const request = await API.serverAPI_WO_Auth.post(`/auth/login`, {
-            email: email,
+            creds: creds,
             password: password
         });
         return request;

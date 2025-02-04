@@ -8,15 +8,17 @@ import tokenGenerator from "../auth/tokenGeneration/generator";
 import jwt from "jsonwebtoken";
 import { removePasswordFromUser } from "../utils/helperFunctions";
 import { logger } from "../utils/logger";
+import { checkDuplicate } from "../utils/db_utils";
+import { redisClient } from "../server";
 
 class AuthController implements Auth_Controller {
     async register(req: any, res: any, next: any): Promise<ModuleRes> {
         try {
             const { username, email, password } = req.body;
-            const check = await User.findOne({ $or: [{ email }, { username }] });
+            const check = await checkDuplicate(email, username);
             if (check) {
-                logger.log("Email or username already exists", `User Name: ${username} Email: ${email}`);
-                return res.status(400).json({ status: "error", message: "Email or username already exists" });
+                logger.log("Exist Error: ", check);
+                return res.status(400).json({ status: "error", message: check });
             }
             const errors = validationResult(req);
             if (!errors.isEmpty()) {
@@ -35,10 +37,11 @@ class AuthController implements Auth_Controller {
     }
     async login(req: any, res: any, next: any): Promise<ModuleRes> {
         try {
-            const { email, password } = req.body;
-            const user:any = await User.findOne({ email });
+            const { creds, password } = req.body;
+            const user:any = await User.findOne({ $or: [{ email: creds }, { username: creds }] });
+            logger.log("user", user);
             if (!user) {
-                return res.status(401).json({ status: "error", message: "User not found." });
+                return res.status(401).json({ status: "error", message: "Username or email is incorrect." });
             }
             const isPasswordValid = await bcrypt.compare(password, user.password);
             if (!isPasswordValid) {
@@ -90,6 +93,23 @@ class AuthController implements Auth_Controller {
         }
         const user = await User.findById(user_id);
         res.status(200).json({ status: "success", message: "User fetched successfully", user: removePasswordFromUser(user) });
+    }
+    async getUserStatus(req: any, res: any, next: any): Promise<any> {
+        try {
+            const { authorization } = req.headers;
+            const token = authorization.split(" ")[1];
+            const decoded = jwt.verify(token, config.secret as any);
+            const user_id = (decoded as any).id;
+            const userRedisData = await redisClient.get(`${user_id}`);
+            const userData = JSON.parse(userRedisData as any);
+            if (userRedisData && userData.status === "online") {
+                return res.status(200).json({...userData });
+            }
+            res.status(200).json({ status: "offline",message: "User is currently offline", user_id });
+        } catch (error) {
+            logger.error("Error in getUserStatus:", error);
+            res.status(400).json({ status: "error", message: error.message });
+        }
     }
 }
 

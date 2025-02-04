@@ -27,13 +27,13 @@ class FriendController implements Friend_Controller {
 
     async addFriend(req: any, res: any, next: any): Promise<ModuleRes> {
         try {
-            const { friend_name } = req.body;
+            const { friend_data } = req.body;
             const user_id = await AuthController.getUserIdFromToken(req);
             const user = await User.findById(user_id);
             if (!user) {
-                return res.status(404).json({ status: "error", message: "User not found." });
+                return res.status(404).json({status: "error", message: "User not found."});
             }
-            const friend = await User.findOne({ username: friend_name });
+            const friend = await User.findOne({ $or: [{ username: friend_data.info }, { email: friend_data.info }] });
             if (!friend) {
                 return res.status(404).json({ status: "error", message: "Friend not found." });
             }
@@ -79,11 +79,12 @@ class FriendController implements Friend_Controller {
             if (!user) {
                 return res.status(404).json({ status: "error", message: "User not found." });
             }
-            const statusOfCaching = await this.checkingRedisCache(user_id, 'friends');
-            logger.log(`Redis cache status: ${statusOfCaching.status}`);
-            if (statusOfCaching.status === "already cached") {
-                return res.status(200).json({ status: "success", friends: JSON.parse(statusOfCaching.data) });
-            }
+            // const statusOfCaching = await this.checkingRedisCache(user_id, 'friends');
+            // logger.log(`Redis cache status: ${statusOfCaching.status}`);
+            // * TODO: Remove this
+            // if (statusOfCaching.status === "already cached") {
+            //     return res.status(200).json({ status: "success", friends: JSON.parse(statusOfCaching.data) });
+            // }
             const friends = await User.find({ _id: { $in: user.friends } });
             const sensFriends = friends?.map((friend:any) => {
                 const { password, ...rest } = friend.toObject();
@@ -245,11 +246,11 @@ class FriendController implements Friend_Controller {
         try {
             const user = await User.findById(user_id);
             const friends = await User.find({ _id: { $in: user.friends } });
-            await redisClient.del(`${user_id}_${type}`).catch(err => {
-                logger.error('Error deleting Redis cache:', err);
-                throw err;
-            });
-            await redisClient.setEx(`${user_id}_${type}`, parseInt(process.env.REDIS_EXPIRE_TIME), JSON.stringify(friends));
+            // await redisClient.hDel(`${user_id}_${type}`).catch(err => {
+            //     logger.error('Error deleting Redis cache:', err);
+            //     throw err;
+            // });
+            await redisClient.hSet(`${user_id}_${type}`, parseInt(process.env.REDIS_EXPIRE_TIME), JSON.stringify(friends));
         } catch (error) {
             logger.error(`error in updating ${type} redis cache`, error);
             throw error;
